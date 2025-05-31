@@ -11,3 +11,11 @@ export type TokenDto = {
   creationDate: number;
   expirationDate: number;
 };
+
+export type RegisterDto = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+}

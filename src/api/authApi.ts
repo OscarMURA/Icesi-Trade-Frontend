@@ -1,10 +1,10 @@
 import axios from './axiosConfig';
-import { LogInDto, TokenDto } from '../types/authTypes';
+import { LogInDto, TokenDto, RegisterDto } from '../types/authTypes';
 
 export async function loginRequest(data: LogInDto): Promise<TokenDto> {
   try {
     console.log('Intentando login con:', { email: data.email, password: '***' });
-    const response = await axios.post('/g1/losbandalos/api/auth/login', data);
+    const response = await axios.post('/api/auth/login', data);
     console.log('Respuesta del servidor:', response.data);
     
     if (!response.data || !response.data.token) {
@@ -24,5 +24,20 @@ export async function loginRequest(data: LogInDto): Promise<TokenDto> {
       // Algo ocurrió al configurar la petición
       throw new Error('Error al procesar la petición: ' + error.message);
     }
+  }
+}
+
+export async function registerRequest(data: RegisterDto): Promise<void> {
+  try {
+    const response = await axios.post('/api/users', data);
+    if (response.status !== 201 && response.status !== 200) {
+      throw new Error(response.data.message || 'Error al registrar usuario');
+    }
+  } catch (error: any) {
+    console.error('Error en registerRequest:', error);
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error('No se pudo completar el registro. Intenta más tarde.');
   }
 }
