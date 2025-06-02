@@ -1,19 +1,11 @@
-import { BrowserRouter } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import AppRouter from './routes/AppRouter';
 import { AuthProvider } from './contexts/AuthContext';
+import router from './routes/AppRouter';
+import { RouterProvider } from 'react-router'
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <div className="min-h-screen bg-gray-100">
-          <Navbar />
-          <main className="p-6">
-            <AppRouter />
-          </main>
-        </div>
-      </BrowserRouter>
+      <RouterProvider router={router} />
     </AuthProvider>
   );
 }
