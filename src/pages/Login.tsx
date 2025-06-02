@@ -14,7 +14,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Redirigir si ya está autenticado
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/profile');
