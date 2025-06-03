@@ -17,7 +17,6 @@ export default function Navbar() {
       <div className="flex gap-4 items-center">
         {user ? (
           <>
-            <span className="text-gray-700">Hola, {user.name}</span>
             <Link to="/profile" className="hover:text-blue-600">Mi perfil</Link>
             <button onClick={handleLogout} className="text-red-600 hover:underline">Cerrar sesión</button>
           </>

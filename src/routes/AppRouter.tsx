@@ -1,13 +1,13 @@
 import { Typography } from '@mui/joy';
 import { createBrowserRouter } from 'react-router-dom';
-import AuthWrapper from '../components/AuthWrapper';
+import AuthWrapper from '../components/auth/AuthWrapper';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import ProductDetail from '../pages/ProductDetail';
 import ProductList from '../pages/ProductList';
 import Profile from '../pages/Profile';
 import Register from '../pages/Register';
-import Layout from '../components/Layout';
+import Layout from '../components/utils/Layout';
 
 const router = createBrowserRouter([
   { path: '', 

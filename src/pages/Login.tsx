@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { loginRequest } from '../api/authApi';
 import { LogInDto } from '../types/authTypes';
 import useAuth from '../hooks/useAuth';
-import MessageToast from '../components/MessageToast';
-import LoadingSpinner from '../components/LoadingSpinner';
+import MessageToast from '../components/utils/MessageToast';
+import LoadingSpinner from '../components/utils/LoadingSpinner';
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();

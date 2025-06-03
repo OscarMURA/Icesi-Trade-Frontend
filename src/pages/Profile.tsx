@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { getProfile } from '../api/userServices';
 import { UserResponseDto } from '../types/userTypes';
+import UserInfo from '../components/profile/UserInfo';
+import UserEditForm from '../components/profile/UserEditForm';
 
 export default function Profile() {
   const [profile, setProfile] = useState<UserResponseDto | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token'); // O desde tu contexto
+    const token = localStorage.getItem('token');
     if (token) {
       getProfile(token)
         .then(setProfile)
@@ -17,15 +20,23 @@ export default function Profile() {
     }
   }, []);
 
+  const handleEdit = () => setEditing(true);
+  const handleCancel = () => setEditing(false);
+  const handleUpdate = (updatedUser: UserResponseDto) => {
+    setProfile(updatedUser);
+    setEditing(false);
+  };
+
   if (error) return <p>Error: {error}</p>;
   if (!profile) return <p>Cargando...</p>;
 
   return (
     <div>
-      <h2>Perfil de Usuario</h2>
-      <p><strong>Nombre:</strong> {profile.name}</p>
-      <p><strong>Email:</strong> {profile.email}</p>
-      <p><strong>Teléfono:</strong> {profile.phone}</p>
+      {!editing ? (
+        <UserInfo user={profile} onEdit={handleEdit} />
+      ) : (
+        <UserEditForm user={profile} onCancel={handleCancel} onUpdate={handleUpdate} />
+      )}
     </div>
   );
 }
