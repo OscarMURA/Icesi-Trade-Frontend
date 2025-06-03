@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { loginRequest } from '../api/authApi';
 import { LogInDto } from '../types/authTypes';
 import useAuth from '../hooks/useAuth';
 import MessageToast from '../components/utils/MessageToast';
 import LoadingSpinner from '../components/utils/LoadingSpinner';
+
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
@@ -14,11 +15,14 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/profile';
+
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/profile');
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, from]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -44,7 +48,6 @@ export default function Login() {
       }
 
       login(response);
-      navigate('/profile');
     } catch (err: any) {
       console.error('Error en login:', err);
       if (err.response) {

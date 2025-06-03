@@ -8,6 +8,8 @@ import ProductList from '../pages/ProductList';
 import Profile from '../pages/Profile';
 import Register from '../pages/Register';
 import Layout from '../components/utils/Layout';
+import CreateProduct from '../pages/CreateProduct';
+
 
 const router = createBrowserRouter([
   { path: '', 
@@ -31,7 +33,8 @@ const router = createBrowserRouter([
         children: [
           { path: 'profile', element: <Profile /> },
           { path: 'products', element: <ProductList /> },
-          { path: 'products/:id', element: <ProductDetail /> }
+          { path: 'products/:id', element: <ProductDetail /> },
+          { path: 'create-product', element: <CreateProduct /> }
         ]
       },
       {

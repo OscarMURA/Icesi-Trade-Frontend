@@ -4,6 +4,7 @@ export type LogInDto = {
 };
 
 export type TokenDto = {
+  id: number;
   name: string;
   email: string;
   roles: string[];
