@@ -12,19 +12,20 @@ import CreateProduct from '../pages/CreateProduct';
 import ChatPage from '../pages/ChatPage';
 
 const router = createBrowserRouter([
-  { path: '', 
+  { 
+    path: '/g1/losbandalos/Icesi-Trade', 
     element: <Layout />, 
     children: [
       {
-        path: '/',
+        path: '',
         element: <Home />
       },
       {
-        path: '/login',
+        path: 'login',
         element: <Login />
       },
       {
-        path: '/register',
+        path: 'register',
         element: <Register />
       },
       {
@@ -42,7 +43,8 @@ const router = createBrowserRouter([
         path: '*',
         element: <Typography>404 - Página no encontrada</Typography>
       }
-  ] },
+    ] 
+  },
 ]);
 
 export default router;

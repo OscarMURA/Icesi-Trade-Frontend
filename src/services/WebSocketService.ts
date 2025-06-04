@@ -12,6 +12,7 @@ class WebSocketService {
   private reconnectDelay = 5000;
   private isConnecting = false;
   private reconnectTimeout: number | null = null;
+  private WS_URL = import.meta.env.VITE_WS_URL;
 
   private constructor() {}
 
@@ -59,8 +60,10 @@ class WebSocketService {
     this.isConnecting = true;
     console.log('Inicializando cliente STOMP...');
 
+    const wsUrl = `${this.WS_URL}/g1/losbandalos/ws`;
+
     this.stompClient = new Client({
-      brokerURL: 'ws://localhost:8080/g1/losbandalos/ws',
+      brokerURL: wsUrl,
       connectHeaders: {
         username: this.username,
         userId: this.userId.toString()
@@ -72,7 +75,7 @@ class WebSocketService {
       heartbeatIncoming: 0,
       heartbeatOutgoing: 0,
       webSocketFactory: () => {
-        return new window.WebSocket('ws://localhost:8080/g1/losbandalos/ws');
+        return new window.WebSocket(wsUrl);
       },
       onConnect: () => {
         console.log('Conectado al WebSocket exitosamente');

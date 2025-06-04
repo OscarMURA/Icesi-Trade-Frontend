@@ -48,7 +48,7 @@ export default function Register() {
       login(response);
 
       // 4. Redirigir
-      navigate('/profile');
+      navigate('/g1/losbandalos/Icesi-Trade/profile');
 
     } catch (err: any) {
       console.error('Error en registro/login:', err);

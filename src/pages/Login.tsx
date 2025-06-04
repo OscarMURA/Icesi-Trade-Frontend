@@ -16,7 +16,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
 
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/profile';
+  const from = location.state?.from?.pathname || '/g1/losbandalos/Icesi-Trade/profile';
 
   useEffect(() => {
     if (isAuthenticated) {

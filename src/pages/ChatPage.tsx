@@ -16,6 +16,9 @@ const ChatPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
 
+  const BASE_BACKEND = import.meta.env.VITE_BASE_URL;
+
+
   const handleReceiveMessage = useCallback((msg: any) => {
     try {
       const message = JSON.parse(msg.body);
@@ -29,40 +32,36 @@ const ChatPage: React.FC = () => {
     }
   }, [selectedUser]);
 
-  const loadMessages = async (userId: number) => {
+  const loadUsers = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No hay token de autenticación');
       }
 
-      const response = await axios.get(`http://localhost:8080/g1/losbandalos/api/chat/messages?userId=${userId}`, {
+      const response = await axios.get(`${BASE_BACKEND}/api/chat/users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
       if (response.data && Array.isArray(response.data)) {
-        const filteredMessages = response.data.filter((msg: any) => 
-          (msg.senderId === userId || msg.receiverId === userId) &&
-          (msg.senderId === user?.id || msg.receiverId === user?.id)
-        );
-        setMessages(filteredMessages);
-        console.log('Mensajes cargados:', filteredMessages);
+        const filteredUsers = response.data.filter((u: UserResponseDto) => u.id !== user?.id);
+        setUsers(filteredUsers);
+        console.log('Usuarios cargados:', filteredUsers);
+      } else {
+        console.error('Respuesta inválida del servidor:', response.data);
+        throw new Error('Formato de respuesta inválido');
       }
-    } catch (error) {
-      console.error('Error al cargar mensajes:', error);
-      setError('Error al cargar mensajes');
+    } catch (error: any) {
+      console.error('Error al cargar usuarios:', error);
+      if (error.response) {
+        console.error('Respuesta del servidor:', error.response.data);
+        console.error('Estado:', error.response.status);
+      }
+      throw new Error('Error al cargar usuarios');
     }
-  };
-
-  const handleUserSelect = async (selectedUser: UserResponseDto) => {
-    setSelectedUser(selectedUser);
-    setMessages([]);
-    if (user) {
-      await loadMessages(selectedUser.id);
-    }
-  };
+  }, [user?.id, BASE_BACKEND]);
 
   const initializeChat = useCallback(async () => {
     try {
@@ -90,7 +89,42 @@ const ChatPage: React.FC = () => {
       setError('Error al inicializar el chat');
       setIsLoading(false);
     }
-  }, [handleReceiveMessage]);
+  }, [handleReceiveMessage, loadUsers]);
+
+  const loadMessages = async (userId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No hay token de autenticación');
+      }
+
+      const response = await axios.get(`${BASE_BACKEND}/api/chat/messages?userId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data && Array.isArray(response.data)) {
+        const filteredMessages = response.data.filter((msg: any) => 
+          (msg.senderId === userId || msg.receiverId === userId) &&
+          (msg.senderId === user?.id || msg.receiverId === user?.id)
+        );
+        setMessages(filteredMessages);
+        console.log('Mensajes cargados:', filteredMessages);
+      }
+    } catch (error) {
+      console.error('Error al cargar mensajes:', error);
+      setError('Error al cargar mensajes');
+    }
+  };
+
+  const handleUserSelect = async (selectedUser: UserResponseDto) => {
+    setSelectedUser(selectedUser);
+    setMessages([]);
+    if (user) {
+      await loadMessages(selectedUser.id);
+    }
+  };
 
   useEffect(() => {
     initializeChat();
@@ -101,37 +135,6 @@ const ChatPage: React.FC = () => {
       setIsConnected(false);
     };
   }, [initializeChat]);
-
-  const loadUsers = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No hay token de autenticación');
-      }
-
-      const response = await axios.get('http://localhost:8080/g1/losbandalos/api/chat/users', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.data && Array.isArray(response.data)) {
-        const filteredUsers = response.data.filter((u: UserResponseDto) => u.id !== user?.id);
-        setUsers(filteredUsers);
-        console.log('Usuarios cargados:', filteredUsers);
-      } else {
-        console.error('Respuesta inválida del servidor:', response.data);
-        throw new Error('Formato de respuesta inválido');
-      }
-    } catch (error: any) {
-      console.error('Error al cargar usuarios:', error);
-      if (error.response) {
-        console.error('Respuesta del servidor:', error.response.data);
-        console.error('Estado:', error.response.status);
-      }
-      throw new Error('Error al cargar usuarios');
-    }
-  };
 
   const handleRetry = async () => {
     setError(null);

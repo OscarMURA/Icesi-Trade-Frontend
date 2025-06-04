@@ -50,7 +50,7 @@ instance.interceptors.response.use(
         // Token expirado o inválido
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        window.location.href = '/g1/losbandalos/Icesi-Trade/login';
       }
     } else if (error.request) {
       // La petición fue hecha pero no se recibió respuesta
