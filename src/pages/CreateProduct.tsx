@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { getCategories, Category } from "../api/categoryApi";
-import { createProduct } from "../api/productApi"; // Asumiendo que tienes esta función
+import { getCategories} from "../api/categoryApi";
+import { Category } from "../types/categoryTypes";
+import { createProduct } from "../api/productApi"; 
 import { ProductCreateDto } from "../types/productTypes";
+import { Button, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress } from '@mui/material';
 
 export default function CreateProduct() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -11,32 +13,29 @@ export default function CreateProduct() {
     status: "Disponible",
     price: 0,
     location: "",
-    categoryId: 0,
+    categoryId: 0, // categoryId es un número
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     getCategories()
       .then(setCategories)
-      .catch((error) => console.error("Error cargando categorías:", error));
+      .catch(() => setError("Error cargando categorías"));
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: name === "price" || name === "categoryId" ? Number(value) : value,
-    }));
-  };
-
+  // Función para manejar el cambio de los valores del formulario
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       const data = await createProduct(form);
       console.log("Producto creado:", data);
       alert("Producto publicado con éxito");
-      // Opcional: limpiar formulario aquí
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
+      setError("Error al publicar el producto");
       console.error("Error al publicar:", error);
-      alert("Error al publicar el producto");
     }
   };
 
@@ -48,38 +47,73 @@ export default function CreateProduct() {
           e.preventDefault();
           handleSubmit();
         }}
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-4"
       >
-        <input name="title" placeholder="Título" onChange={handleChange} className="border p-2" />
-        <textarea name="description" placeholder="Descripción" onChange={handleChange} className="border p-2" />
-        <input
+        <TextField
+          label="Título"
+          name="title"
+          value={form.title}
+          onChange={(e) => setForm({ ...form, title: e.target.value })}
+          fullWidth
+          variant="outlined"
+          required
+        />
+        <TextField
+          label="Descripción"
+          name="description"
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          fullWidth
+          multiline
+          rows={4}
+          variant="outlined"
+          required
+        />
+        <TextField
+          label="Precio"
           name="price"
           type="number"
-          placeholder="Precio"
-          onChange={handleChange}
-          className="border p-2"
           value={form.price}
-        />
-        <input name="location" placeholder="Ubicación" onChange={handleChange} className="border p-2" />
-        <select
-          name="categoryId"
-          onChange={handleChange}
-          value={form.categoryId}
-          className="border p-2"
+          onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+          fullWidth
+          variant="outlined"
           required
+        />
+        <TextField
+          label="Ubicación"
+          name="location"
+          value={form.location}
+          onChange={(e) => setForm({ ...form, location: e.target.value })}
+          fullWidth
+          variant="outlined"
+          required
+        />
+        <FormControl fullWidth variant="outlined">
+          <InputLabel>Selecciona una categoría</InputLabel>
+          <Select
+            name="categoryId"
+            value={form.categoryId} // El valor de categoryId sigue siendo un número
+            onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })} // Solo actualizamos el categoryId
+            required
+          >
+            <MenuItem value={0} disabled>Selecciona una categoría</MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem> // Valor numérico para categoryId
+            ))}
+          </Select>
+        </FormControl>
+
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={loading}
+          fullWidth
         >
-          <option value={0} disabled>
-            Selecciona una categoría
-          </option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-        <button type="submit" className="bg-blue-500 text-white p-2">
-          Publicar
-        </button>
+          {loading ? <CircularProgress size={24} color="secondary" /> : "Publicar"}
+        </Button>
+
+        {error && <div className="text-red-500 mt-2">{error}</div>}
       </form>
     </div>
   );
