@@ -1,4 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm.cmd run build
+if command -v npm.cmd &> /dev/null; then
+  npm.cmd run lint
+else
+  npm run lint
+fi
