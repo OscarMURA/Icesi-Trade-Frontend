@@ -69,8 +69,11 @@ class WebSocketService {
         console.log('STOMP Debug:', str);
       },
       reconnectDelay: this.reconnectDelay,
-      heartbeatIncoming: 10000,
-      heartbeatOutgoing: 10000,
+      heartbeatIncoming: 0,
+      heartbeatOutgoing: 0,
+      webSocketFactory: () => {
+        return new window.WebSocket('ws://localhost:8080/g1/losbandalos/ws');
+      },
       onConnect: () => {
         console.log('Conectado al WebSocket exitosamente');
         this.isConnecting = false;
