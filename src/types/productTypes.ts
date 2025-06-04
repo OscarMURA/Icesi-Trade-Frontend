@@ -19,5 +19,4 @@ export type ProductCreateDto = {
   price: number;
   location: string;
   categoryId: number;
-  sellerId: number;
 };
