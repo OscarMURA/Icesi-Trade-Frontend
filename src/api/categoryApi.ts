@@ -1,10 +1,5 @@
 import axios from './axiosConfig';
-
-export type Category = {
-  id: number;
-  name: string;
-  description?: string;
-};
+import { Category } from '../types/categoryTypes';
 
 export const getCategories = async (): Promise<Category[]> => {
   const response = await axios.get('/api/categories');
