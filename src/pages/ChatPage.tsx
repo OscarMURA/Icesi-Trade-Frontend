@@ -116,8 +116,9 @@ const ChatPage: React.FC = () => {
       });
 
       if (response.data && Array.isArray(response.data)) {
-        setUsers(response.data);
-        console.log('Usuarios cargados:', response.data);
+        const filteredUsers = response.data.filter((u: UserResponseDto) => u.id !== user?.id);
+        setUsers(filteredUsers);
+        console.log('Usuarios cargados:', filteredUsers);
       } else {
         console.error('Respuesta inválida del servidor:', response.data);
         throw new Error('Formato de respuesta inválido');

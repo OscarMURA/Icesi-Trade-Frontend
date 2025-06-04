@@ -6,7 +6,7 @@ interface ChatLeftNavBarProps {
   username: string;
   setCurrentChat: (chat: string) => void;
   chats: string[];
-  setChats: (chats: string[]) => void;
+  setChats: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const ChatLeftNavBar: React.FC<ChatLeftNavBarProps> = ({
@@ -20,7 +20,7 @@ const ChatLeftNavBar: React.FC<ChatLeftNavBarProps> = ({
 
   const handleNewChat = () => {
     if (newChatUser && !chats.includes(newChatUser)) {
-      setChats((prev) => [...prev, newChatUser]);
+      setChats(prevChats => [...prevChats, newChatUser]);
       setCurrentChat(newChatUser);
     }
     setOpenDialog(false);

@@ -11,6 +11,7 @@ class WebSocketService {
   private maxReconnectAttempts = 5;
   private reconnectDelay = 5000;
   private isConnecting = false;
+  private reconnectTimeout: number | null = null;
 
   private constructor() {}
 
@@ -23,26 +24,35 @@ class WebSocketService {
 
   connect(username: string, userId: number, onMessage: (message: any) => void) {
     console.log('Iniciando conexión WebSocket...');
+    
+    // Si ya hay una conexión activa, desconectarla primero
+    if (this.stompClient?.connected) {
+      console.log('Desconectando conexión existente...');
+      this.disconnect();
+    }
+
+    // Limpiar cualquier intento de reconexión pendiente
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+
     this.messageCallback = onMessage;
     this.username = username;
     this.userId = userId;
+    this.reconnectAttempts = 0;
     
-    if (this.stompClient?.connected) {
-      console.log('Ya hay una conexión activa');
-      return;
-    }
-
-    if (this.isConnecting) {
-      console.log('Ya hay una conexión en progreso');
-      return;
-    }
-
     this.initializeStompClient();
   }
 
   private initializeStompClient() {
     if (!this.username || !this.userId) {
       console.error('No hay nombre de usuario o ID para la conexión');
+      return;
+    }
+
+    if (this.isConnecting) {
+      console.log('Ya hay una conexión en progreso');
       return;
     }
 
@@ -70,7 +80,15 @@ class WebSocketService {
       onStompError: (frame) => {
         console.error('Error en STOMP:', frame);
         this.isConnecting = false;
-        this.handleReconnect();
+        
+        // Si el error es "Session closed", intentar reconectar inmediatamente
+        if (frame.headers.message === 'Session closed.') {
+          console.log('Sesión cerrada, intentando reconectar...');
+          this.reconnectAttempts = 0;
+          this.handleReconnect();
+        } else {
+          this.handleReconnect();
+        }
       },
       onWebSocketError: (event) => {
         console.error('Error en WebSocket:', event);
@@ -99,7 +117,15 @@ class WebSocketService {
       this.reconnectAttempts++;
       console.log(`Intentando reconectar (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
       
-      setTimeout(() => {
+      // Limpiar cualquier intento de reconexión pendiente
+      if (this.reconnectTimeout) {
+        clearTimeout(this.reconnectTimeout);
+      }
+
+      // Calcular el tiempo de espera con backoff exponencial
+      const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+      
+      this.reconnectTimeout = window.setTimeout(() => {
         if (this.stompClient) {
           try {
             this.stompClient.deactivate();
@@ -108,7 +134,7 @@ class WebSocketService {
             console.error('Error durante la reconexión:', error);
           }
         }
-      }, this.reconnectDelay * this.reconnectAttempts);
+      }, delay);
     } else {
       console.error('Número máximo de intentos de reconexión alcanzado');
       this.disconnect();
@@ -141,6 +167,13 @@ class WebSocketService {
 
   disconnect() {
     console.log('Desconectando WebSocket...');
+    
+    // Limpiar el timeout de reconexión
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+
     if (this.stompClient) {
       try {
         this.stompClient.deactivate();
@@ -149,6 +182,7 @@ class WebSocketService {
       }
       this.stompClient = null;
     }
+    
     this.messageCallback = null;
     this.username = null;
     this.userId = null;
