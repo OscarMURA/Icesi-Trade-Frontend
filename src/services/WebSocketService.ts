@@ -6,6 +6,7 @@ class WebSocketService {
   private stompClient: Client | null = null;
   private messageCallback: ((message: any) => void) | null = null;
   private username: string | null = null;
+  private userId: number | null = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 5000;
@@ -20,10 +21,11 @@ class WebSocketService {
     return WebSocketService.instance;
   }
 
-  connect(username: string, onMessage: (message: any) => void) {
+  connect(username: string, userId: number, onMessage: (message: any) => void) {
     console.log('Iniciando conexión WebSocket...');
     this.messageCallback = onMessage;
     this.username = username;
+    this.userId = userId;
     
     if (this.stompClient?.connected) {
       console.log('Ya hay una conexión activa');
@@ -39,8 +41,8 @@ class WebSocketService {
   }
 
   private initializeStompClient() {
-    if (!this.username) {
-      console.error('No hay nombre de usuario para la conexión');
+    if (!this.username || !this.userId) {
+      console.error('No hay nombre de usuario o ID para la conexión');
       return;
     }
 
@@ -50,7 +52,8 @@ class WebSocketService {
     this.stompClient = new Client({
       brokerURL: 'ws://localhost:8080/g1/losbandalos/ws',
       connectHeaders: {
-        username: this.username
+        username: this.username,
+        userId: this.userId.toString()
       },
       debug: (str) => {
         console.log('STOMP Debug:', str);
@@ -120,13 +123,8 @@ class WebSocketService {
 
     try {
       console.log('Suscribiéndose a tópicos...');
-      this.stompClient.subscribe('/topic/public', (message) => {
-        console.log('Mensaje recibido en /topic/public:', message);
-        if (this.messageCallback) {
-          this.messageCallback(message);
-        }
-      });
-
+      
+      // Suscribirse al tópico privado del usuario
       if (this.username) {
         this.stompClient.subscribe(`/user/${this.username}/queue/messages`, (message) => {
           console.log('Mensaje privado recibido:', message);
@@ -153,49 +151,22 @@ class WebSocketService {
     }
     this.messageCallback = null;
     this.username = null;
+    this.userId = null;
     this.reconnectAttempts = 0;
     this.isConnecting = false;
   }
 
-  sendMessage(sender: string, receiver: string, message: string) {
+  sendMessage(senderId: number, receiverId: number, message: string) {
     console.log('Intentando enviar mensaje...');
     if (!this.stompClient?.connected) {
       console.error('WebSocket no está conectado');
-      this.connect(this.username || '', this.messageCallback || (() => {}));
+      this.connect(this.username || '', this.userId || 0, this.messageCallback || (() => {}));
       throw new Error('WebSocket no está conectado');
     }
 
     const messageObj = {
-      sender,
-      receiver,
-      content: message,
-      timestamp: new Date().toISOString()
-    };
-
-    try {
-      console.log('Enviando mensaje:', messageObj);
-      this.stompClient.publish({
-        destination: '/app/chat.sendMessage',
-        body: JSON.stringify(messageObj)
-      });
-      console.log('Mensaje enviado exitosamente');
-    } catch (error) {
-      console.error('Error al enviar mensaje:', error);
-      throw error;
-    }
-  }
-
-  sendPrivateMessage(sender: string, receiver: string, message: string) {
-    console.log('Intentando enviar mensaje privado...');
-    if (!this.stompClient?.connected) {
-      console.error('WebSocket no está conectado');
-      this.connect(this.username || '', this.messageCallback || (() => {}));
-      throw new Error('WebSocket no está conectado');
-    }
-
-    const messageObj = {
-      sender,
-      receiver,
+      senderId,
+      receiverId,
       content: message,
       timestamp: new Date().toISOString()
     };
@@ -206,9 +177,9 @@ class WebSocketService {
         destination: '/app/chat.private',
         body: JSON.stringify(messageObj)
       });
-      console.log('Mensaje privado enviado exitosamente');
+      console.log('Mensaje enviado exitosamente');
     } catch (error) {
-      console.error('Error al enviar mensaje privado:', error);
+      console.error('Error al enviar mensaje:', error);
       throw error;
     }
   }

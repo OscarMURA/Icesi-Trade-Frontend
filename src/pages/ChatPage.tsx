@@ -20,11 +20,49 @@ const ChatPage: React.FC = () => {
     try {
       const message = JSON.parse(msg.body);
       console.log('Mensaje recibido:', message);
-      setMessages(prev => [...prev, message]);
+      if (selectedUser && 
+          (message.senderId === selectedUser.id || message.receiverId === selectedUser.id)) {
+        setMessages(prev => [...prev, message]);
+      }
     } catch (err) {
       console.error('Error al procesar mensaje:', err);
     }
-  }, []);
+  }, [selectedUser]);
+
+  const loadMessages = async (userId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No hay token de autenticación');
+      }
+
+      const response = await axios.get(`http://localhost:8080/g1/losbandalos/api/chat/messages?userId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.data && Array.isArray(response.data)) {
+        const filteredMessages = response.data.filter((msg: any) => 
+          (msg.senderId === userId || msg.receiverId === userId) &&
+          (msg.senderId === user?.id || msg.receiverId === user?.id)
+        );
+        setMessages(filteredMessages);
+        console.log('Mensajes cargados:', filteredMessages);
+      }
+    } catch (error) {
+      console.error('Error al cargar mensajes:', error);
+      setError('Error al cargar mensajes');
+    }
+  };
+
+  const handleUserSelect = async (selectedUser: UserResponseDto) => {
+    setSelectedUser(selectedUser);
+    setMessages([]);
+    if (user) {
+      await loadMessages(selectedUser.id);
+    }
+  };
 
   const initializeChat = useCallback(async () => {
     try {
@@ -40,7 +78,7 @@ const ChatPage: React.FC = () => {
       
       // Conectar al WebSocket
       console.log('Conectando al WebSocket con usuario:', userData.name);
-      WebSocketService.connect(userData.name, handleReceiveMessage);
+      WebSocketService.connect(userData.name, userData.id, handleReceiveMessage);
       setIsConnected(true);
       
       // Cargar lista de usuarios
@@ -113,12 +151,12 @@ const ChatPage: React.FC = () => {
     try {
       if (!isConnected) {
         console.log('Reconectando WebSocket...');
-        WebSocketService.connect(user.name, handleReceiveMessage);
+        WebSocketService.connect(user.name, user.id, handleReceiveMessage);
         setIsConnected(true);
       }
 
       console.log('Enviando mensaje a:', selectedUser.name);
-      WebSocketService.sendMessage(user.name, selectedUser.name, message);
+      WebSocketService.sendMessage(user.id, selectedUser.id, message);
       setMessage('');
     } catch (err) {
       console.error('Error al enviar mensaje:', err);
@@ -167,7 +205,7 @@ const ChatPage: React.FC = () => {
               <ListItem key={u.id} disablePadding>
                 <ListItemButton 
                   selected={selectedUser?.id === u.id}
-                  onClick={() => setSelectedUser(u)}
+                  onClick={() => handleUserSelect(u)}
                 >
                   <ListItemText primary={u.name} />
                 </ListItemButton>
@@ -194,15 +232,15 @@ const ChatPage: React.FC = () => {
                   key={index}
                   sx={{
                     display: 'flex',
-                    justifyContent: msg.sender === user.name ? 'flex-end' : 'flex-start',
+                    justifyContent: msg.senderId === user?.id ? 'flex-end' : 'flex-start',
                     mb: 2
                   }}
                 >
                   <Paper
                     sx={{
                       p: 2,
-                      backgroundColor: msg.sender === user.name ? 'primary.main' : 'white',
-                      color: msg.sender === user.name ? 'white' : 'black',
+                      backgroundColor: msg.senderId === user?.id ? 'primary.main' : 'white',
+                      color: msg.senderId === user?.id ? 'white' : 'black',
                       maxWidth: '70%',
                       boxShadow: 2,
                       borderRadius: 2
@@ -210,7 +248,7 @@ const ChatPage: React.FC = () => {
                   >
                     <Typography>{msg.content}</Typography>
                     <Typography variant="caption" sx={{ display: 'block', textAlign: 'right', mt: 0.5, opacity: 0.7 }}>
-                      {new Date(msg.timestamp).toLocaleTimeString()}
+                      {new Date(msg.createdAt).toLocaleTimeString()}
                     </Typography>
                   </Paper>
                 </Box>
