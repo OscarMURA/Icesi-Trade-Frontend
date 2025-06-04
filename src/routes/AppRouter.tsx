@@ -9,7 +9,7 @@ import Profile from '../pages/Profile';
 import Register from '../pages/Register';
 import Layout from '../components/utils/Layout';
 import CreateProduct from '../pages/CreateProduct';
-
+import ChatPage from '../pages/ChatPage';
 
 const router = createBrowserRouter([
   { path: '', 
@@ -34,7 +34,8 @@ const router = createBrowserRouter([
           { path: 'profile', element: <Profile /> },
           { path: 'products', element: <ProductList /> },
           { path: 'products/:id', element: <ProductDetail /> },
-          { path: 'create-product', element: <CreateProduct /> }
+          { path: 'create-product', element: <CreateProduct /> },
+          { path: 'chat', element: <ChatPage /> }
         ]
       },
       {

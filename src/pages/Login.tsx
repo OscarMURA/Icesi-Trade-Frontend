@@ -47,6 +47,10 @@ export default function Login() {
         throw new Error('No se recibió un token válido del servidor');
       }
 
+      // Guardar el nombre de usuario y el token
+      localStorage.setItem('username', response.name);
+      localStorage.setItem('token', response.token);
+      
       login(response);
     } catch (err: any) {
       console.error('Error en login:', err);

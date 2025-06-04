@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userData = JSON.parse(storedUser);
         setUser(userData);
         setIsAuthenticated(true);
-      } catch (error) {
+      } catch {
         // Si hay un error al parsear el usuario almacenado, limpiar el estado
         localStorage.removeItem('token');
         localStorage.removeItem('user');
@@ -61,6 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Guardar en localStorage
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', data.token);
+
+    console.log('Usuario guardado en localStorage:', userData); 
   };
 
   const logout = () => {
