@@ -2,6 +2,15 @@ import axios from './axiosConfig';
 import { jwtDecode } from 'jwt-decode';
 import { UserResponseDto } from '../types/userTypes';
 
+export const getToken = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error("No token found");
+        return null;
+    }
+    return token;
+};
+
 export const getIdFromToken = () => {
     const token = localStorage.getItem('token');
     if (!token) {

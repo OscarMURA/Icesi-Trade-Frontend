@@ -1,57 +1,62 @@
-import { useEffect, useState } from "react";
-import { Product } from "../../types/productTypes";
-import { Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
-import axios from "axios";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { updateProduct, deleteProduct } from '../../api/productApi';
+import { Product } from '../../types/productTypes';
+import ProductInfo from './ProductInfo';
+import ProductEditForm from './ProductEditForm';
+import useAuth from '../../hooks/useAuth';
+import { getIdFromToken } from '../../api/userServices';
 
 export default function ProductCard({ product }: { product: Product }) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [isCurrentUserSeller, setIsCurrentUserSeller] = useState(false);
+  const [editing, setEditing] = useState(false);
 
-  useEffect(() => {
-    const fetchSeller = async () => {
-      if (user && product.sellerId) {
-        try {
-          const BASE_BACKEND = import.meta.env.VITE_BASE_URL;
-          const response = await axios.get(`${BASE_BACKEND}/api/users/${product.sellerId}`);
-          const seller = response.data;
-          if (seller.email === user.email) {
-            setIsCurrentUserSeller(true);
-          } else {
-            setIsCurrentUserSeller(false);
-          }
-        } catch {
-          setIsCurrentUserSeller(false);
-        }
-      }
-    };
-    fetchSeller();
-  }, [user, product.sellerId]);
+  const isOwner = user && product.sellerId === getIdFromToken();
 
-  const handleChatClick = () => {
-    if (isCurrentUserSeller) return;
-    navigate(`/g1/losbandalos/Icesi-Trade/chat?userId=${product.sellerId}`);
+  const handleEdit = () => setEditing(true);
+  const handleCancel = () => setEditing(false);
+
+  const handleUpdate = async (updated: Product) => {
+    try {
+      await updateProduct(product.id, updated);
+      alert("Producto actualizado exitosamente.");
+      setEditing(false);
+    } catch (err) {
+      alert("Error al actualizar el producto.");
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm("¿Seguro que deseas eliminar este producto?");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteProduct(product.id);
+      alert("Producto eliminado exitosamente.");
+      navigate('/my-products');
+    } catch (err) {
+      alert("Error al eliminar el producto.");
+      console.error(err);
+    }
   };
 
   return (
     <div>
-      <h2>{product.title}</h2>
-      <p>{product.description}</p>
-      <h3>{`$${product.price}`}</h3>
-      <div style={{ display: isCurrentUserSeller ? "none" : "block" }}>
-        {user && (
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleChatClick}
-            sx={{ mt: 1 }}
-          >
-            Chatear con el vendedor
-          </Button>
-        )}
-      </div>
+      {!editing ? (
+        <ProductInfo
+          product={product}
+          onEdit={isOwner ? handleEdit : undefined}
+          onDelete={isOwner ? () => handleDelete() : undefined}
+        />
+      ) : (
+        <ProductEditForm
+          product={product}
+          onCancel={handleCancel}
+          onUpdate={handleUpdate}
+        />
+      )}
     </div>
   );
 }
