@@ -41,26 +41,61 @@ const ChatPage: React.FC = () => {
         throw new Error('No hay token de autenticación');
       }
 
-      const response = await axios.get(`${BASE_BACKEND}/api/chat/users`, {
+      // Obtenemos todos los usuarios
+      const usersResponse = await axios.get(`${BASE_BACKEND}/api/chat/users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (response.data && Array.isArray(response.data)) {
-        const filteredUsers = response.data.filter((u: UserResponseDto) => u.id !== user?.id);
-        setUsers(filteredUsers);
-        console.log('Usuarios cargados:', filteredUsers);
+      if (usersResponse.data && Array.isArray(usersResponse.data)) {
+        // Filtramos los usuarios que no son el usuario actual
+        const filteredUsers = usersResponse.data.filter((u: UserResponseDto) => u.id !== user?.id);
+        
+        // Para cada usuario, verificamos si hay mensajes entre el usuario actual y ese usuario
+        const usersWithMessages = await Promise.all(
+          filteredUsers.map(async (otherUser: UserResponseDto) => {
+            try {
+              const messagesResponse = await axios.get(
+                `${BASE_BACKEND}/api/chat/messages?userId=${otherUser.id}`,
+                {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                }
+              );
+              
+              // Verificamos si hay mensajes entre el usuario actual y el otro usuario
+              const hasMessagesWithCurrentUser = messagesResponse.data.some((msg: any) => 
+                (msg.senderId === user?.id && msg.receiverId === otherUser.id) || 
+                (msg.senderId === otherUser.id && msg.receiverId === user?.id)
+              );
+              
+              // Incluimos al usuario si tiene mensajes o si es el vendedor seleccionado
+              return (hasMessagesWithCurrentUser || otherUser.id === selectedUserId) ? otherUser : null;
+            } catch (error) {
+              console.error(`Error al obtener mensajes para usuario ${otherUser.id}:`, error);
+              // Si hay error pero es el vendedor seleccionado, lo incluimos de todos modos
+              return otherUser.id === selectedUserId ? otherUser : null;
+            }
+          })
+        );
+
+        // Filtramos los usuarios que tienen mensajes con el usuario actual o son el vendedor seleccionado
+        const usersWithChats = usersWithMessages.filter((user): user is UserResponseDto => user !== null);
+        
+        setUsers(usersWithChats);
+        console.log('Usuarios con mensajes cargados:', usersWithChats);
 
         if (selectedUserId && !selectedUser) {
-          const userToSelect = filteredUsers.find(u => u.id === selectedUserId);
+          const userToSelect = usersWithChats.find(u => u.id === selectedUserId);
           if (userToSelect) {
             setSelectedUser(userToSelect);
             loadMessages(userToSelect.id);
           }
         }
       } else {
-        console.error('Respuesta inválida del servidor:', response.data);
+        console.error('Respuesta inválida del servidor:', usersResponse.data);
         throw new Error('Formato de respuesta inválido');
       }
     } catch (error: any) {
