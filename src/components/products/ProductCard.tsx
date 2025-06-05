@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updateProduct, deleteProduct, markProductAsSold } from '../../api/productApi';
-import { toggleFavoriteProduct, getFavoriteProductsByUser } from '../../api/favoriteApi';
-import { Product } from '../../types/productTypes';
-import ProductInfo from './ProductInfo';
-import ProductEditForm from './ProductEditForm';
-import useAuth from '../../hooks/useAuth';
+import { getFavoriteProductsByUser, toggleFavoriteProduct } from '../../api/favoriteApi';
+import { deleteProduct, markProductAsSold, updateProduct } from '../../api/productApi';
+import { createSale } from '../../api/salesApi';
 import { getIdFromToken } from '../../api/userServices';
+import useAuth from '../../hooks/useAuth';
+import { Product } from '../../types/productTypes';
+import ProductEditForm from './ProductEditForm';
+import ProductInfo from './ProductInfo';
+import { SaleCreate } from '../../types/saleTypes';
 
 export default function ProductCard({ product }: { product: Product }) {
   const navigate = useNavigate();
@@ -93,17 +95,25 @@ export default function ProductCard({ product }: { product: Product }) {
       return;
     }
   
-    const offer = {
-      userId: getIdFromToken(),
+    const offer: SaleCreate = {
+      buyerId: getIdFromToken(),
       productId: product.id,
-      proposedPrice: parseFloat(offerPrice)
+      price: parseFloat(offerPrice),
+      status: 'pending'
     };
   
     console.log("Oferta enviada:", offer);
   
-    // Aquí llamarías a tu API para guardar la oferta (aún por implementar)
-    alert("Oferta enviada exitosamente.");
-    setOfferPrice('');
+    createSale(offer)
+      .then(() => { 
+        alert("Oferta enviada exitosamente.");
+        setOfferPrice('');
+      }
+      )
+      .catch((err: any) => {
+        console.error("Error al enviar oferta:", err.response?.data || err.message);
+        alert("Error al enviar oferta.");
+      });
   };
   
   return (
