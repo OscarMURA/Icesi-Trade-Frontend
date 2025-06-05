@@ -15,6 +15,7 @@ export default function ProductEditForm({
     title: product.title,
     description: product.description,
     price: product.price,
+    imageUrl: product.imageUrl || '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +46,12 @@ export default function ProductEditForm({
         label="Precio"
         type="number"
         value={form.price}
+        onChange={handleChange}
+      />
+      <TextField
+        name="imageUrl"
+        label="URL de imagen"
+        value={form.imageUrl}
         onChange={handleChange}
       />
       <Stack direction="row" spacing={2}>

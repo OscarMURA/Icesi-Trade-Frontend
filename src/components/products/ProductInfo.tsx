@@ -21,10 +21,18 @@ export default function ProductInfo({
   showFavorite?: boolean;
 }) {
   return (
-    <div>
-      <h2>{product.title}</h2>
-      <p>{product.description}</p>
-      <h3>{`$${product.price}`}</h3>
+    <div className="bg-white shadow rounded p-4">
+      {product.imageUrl && (
+        <img
+          src={product.imageUrl}
+          alt={product.title}
+          className="w-full h-48 object-cover rounded mb-4"
+        />
+      )}
+
+      <h2 className="text-xl font-semibold">{product.title}</h2>
+      <p className="text-gray-700">{product.description}</p>
+      <h3 className="text-blue-700 font-bold text-lg">${product.price}</h3>
 
       <Stack direction="row" spacing={2} mt={2}>
         {onEdit && <Button variant="outlined" onClick={onEdit}>Editar</Button>}

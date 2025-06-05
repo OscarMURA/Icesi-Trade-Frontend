@@ -6,6 +6,7 @@ export type Product = {
   price: number;
   location: string;
   isSold: boolean;
+  imageUrl?: string;
   categoryId: number;
   sellerId: number;
   createdAt: string;     
@@ -19,4 +20,5 @@ export type ProductCreateDto = {
   price: number;
   location: string;
   categoryId: number;
+  imageUrl?: string; // Optional for creation, can be added later
 };

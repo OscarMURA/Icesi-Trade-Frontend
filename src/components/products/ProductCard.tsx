@@ -14,7 +14,6 @@ export default function ProductCard({ product }: { product: Product }) {
   const [editing, setEditing] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [offerPrice, setOfferPrice] = useState('');
-
   const isOwner = user && product.sellerId === getIdFromToken();
 
   useEffect(() => {
@@ -53,7 +52,7 @@ export default function ProductCard({ product }: { product: Product }) {
       await deleteProduct(product.id);
       alert("Producto eliminado exitosamente.");
       navigate('/my-products');
-    } catch (err : any) {
+    } catch (err: any) {
       alert("Error al eliminar el producto.");
       console.error(err);
     }
@@ -64,7 +63,7 @@ export default function ProductCard({ product }: { product: Product }) {
       await markProductAsSold(product.id);
       alert("Producto marcado como vendido.");
       window.location.reload(); 
-    } catch (err : any) {
+    } catch (err: any) {
       alert("Error al marcar como vendido.");
       console.error(err);
     }
@@ -75,39 +74,36 @@ export default function ProductCard({ product }: { product: Product }) {
       userId: getIdFromToken(),
       productId: product.id
     };
-  
-    console.log("Enviando favorite:", favorite);
-  
+
     try {
       await toggleFavoriteProduct(favorite);
       setIsFavorite(prev => !prev);
     } catch (err: any) {
-      console.error("Error al actualizar favorito:", err.response?.data || err.message);
       alert("Error al actualizar favorito.");
+      console.error(err);
     }
-  };  
+  };
 
   const handleSendOffer = () => {
     if (!offerPrice || isNaN(Number(offerPrice))) {
       alert("Por favor ingresa un precio válido.");
       return;
     }
-  
-    const offer = {
-      userId: getIdFromToken(),
-      productId: product.id,
-      proposedPrice: parseFloat(offerPrice)
-    };
-  
-    console.log("Oferta enviada:", offer);
-  
-    // Aquí llamarías a tu API para guardar la oferta (aún por implementar)
+
     alert("Oferta enviada exitosamente.");
     setOfferPrice('');
   };
-  
+
   return (
-    <div>
+    <div className="bg-white rounded shadow p-4">
+      {product.imageUrl && (
+        <img
+          src={product.imageUrl}
+          alt={product.title}
+          className="w-full h-48 object-cover rounded mb-4"
+        />
+      )}
+
       {!editing ? (
         <>
           <ProductInfo
@@ -119,17 +115,19 @@ export default function ProductCard({ product }: { product: Product }) {
             isFavorite={isFavorite}
             showFavorite={!isOwner && !!user}
           />
-  
           {!isOwner && user && (
-            <div style={{ marginTop: '1rem' }}>
-              <h4>Haz una oferta</h4>
+            <div className="mt-4">
+              <h4 className="font-medium">Haz una oferta</h4>
               <input
                 type="number"
+                className="border px-2 py-1 mr-2 rounded"
                 placeholder="Precio ofrecido"
                 value={offerPrice}
                 onChange={(e) => setOfferPrice(e.target.value)}
               />
-              <button onClick={handleSendOffer}>Enviar oferta</button>
+              <button onClick={handleSendOffer} className="bg-blue-500 text-white px-4 py-1 rounded">
+                Enviar oferta
+              </button>
             </div>
           )}
         </>
@@ -141,5 +139,5 @@ export default function ProductCard({ product }: { product: Product }) {
         />
       )}
     </div>
-  );  
+  );
 }

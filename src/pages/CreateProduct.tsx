@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { getCategories} from "../api/categoryApi";
+import { getCategories } from "../api/categoryApi";
 import { Category } from "../types/categoryTypes";
-import { createProduct } from "../api/productApi"; 
+import { createProduct } from "../api/productApi";
+import { uploadImage } from "../api/uploadImage";
 import { ProductCreateDto } from "../types/productTypes";
 import { Button, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress } from '@mui/material';
 
@@ -13,8 +14,10 @@ export default function CreateProduct() {
     status: "Disponible",
     price: 0,
     location: "",
-    categoryId: 0, // categoryId es un número
+    categoryId: 0,
+    imageUrl: "" 
   });
+  const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -24,10 +27,15 @@ export default function CreateProduct() {
       .catch(() => setError("Error cargando categorías"));
   }, []);
 
-  // Función para manejar el cambio de los valores del formulario
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      // Primero subir imagen si hay
+      if (image) {
+        const url = await uploadImage(image);
+        form.imageUrl = url;
+      }
+
       const data = await createProduct(form);
       console.log("Producto creado:", data);
       alert("Producto publicado con éxito");
@@ -92,16 +100,30 @@ export default function CreateProduct() {
           <InputLabel>Selecciona una categoría</InputLabel>
           <Select
             name="categoryId"
-            value={form.categoryId} // El valor de categoryId sigue siendo un número
-            onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })} // Solo actualizamos el categoryId
+            value={form.categoryId}
+            onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })}
             required
           >
             <MenuItem value={0} disabled>Selecciona una categoría</MenuItem>
             {categories.map((cat) => (
-              <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem> // Valor numérico para categoryId
+              <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
             ))}
           </Select>
         </FormControl>
+
+        <div>
+          <label htmlFor="image-upload">Imagen del producto</label><br />
+          <input
+            id="image-upload"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                setImage(e.target.files[0]);
+              }
+            }}
+          />
+        </div>
 
         <Button
           type="submit"
