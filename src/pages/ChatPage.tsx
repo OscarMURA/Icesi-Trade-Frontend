@@ -1,6 +1,6 @@
 // src/pages/ChatPage.tsx
 import { Box, Button, TextField, Typography, List, ListItem, ListItemButton, ListItemText, Paper } from '@mui/material';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import WebSocketService from '../services/WebSocketService';
 import { getProfile } from '../api/userServices';
 import { UserResponseDto } from '../types/userTypes';
@@ -17,6 +17,7 @@ const ChatPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const BASE_BACKEND = import.meta.env.VITE_BASE_URL;
 
@@ -101,6 +102,10 @@ const ChatPage: React.FC = () => {
     }
   }, [handleReceiveMessage, loadUsers]);
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const loadMessages = async (userId: number) => {
     try {
       const token = localStorage.getItem('token');
@@ -121,6 +126,7 @@ const ChatPage: React.FC = () => {
         );
         setMessages(filteredMessages);
         console.log('Mensajes cargados:', filteredMessages);
+        setTimeout(scrollToBottom, 100); // Pequeño delay para asegurar que los mensajes se hayan renderizado
       }
     } catch (error) {
       console.error('Error al cargar mensajes:', error);
@@ -267,6 +273,7 @@ const ChatPage: React.FC = () => {
                   </Paper>
                 </Box>
               ))}
+              <div ref={messagesEndRef} />
             </Box>
             <Box 
               component="form" 
