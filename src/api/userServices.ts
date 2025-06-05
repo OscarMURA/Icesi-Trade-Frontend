@@ -35,6 +35,7 @@ export async function getUserById(id: number): Promise<UserResponseDto> {
   }
 }
 
+
 export const updateUser = async (id: number, data: any, token: string) => {
   console.log('Actualizando usuario con ID:', id, 'y datos:', data);
 
@@ -47,3 +48,18 @@ export const updateUser = async (id: number, data: any, token: string) => {
 
   return response.data;
 };
+
+
+export async function getProfile(): Promise<UserResponseDto> {
+  try {
+    const userId = getIdFromToken();
+    if (!userId) {
+      throw new Error('No se pudo obtener el ID del usuario');
+    }
+    return await getUserById(userId);
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || 'Error al obtener perfil');
+  }
+
+  
+}

@@ -1,13 +1,14 @@
+// src/pages/ChatPage.tsx
 import { Box, Button, TextField, Typography, List, ListItem, ListItemButton, ListItemText, Paper } from '@mui/material';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import WebSocketService from '../services/WebSocketService';
-import { getIdFromToken, getUserById } from '../api/userServices';
+import { getProfile } from '../api/userServices';
 import { UserResponseDto } from '../types/userTypes';
 import axios from 'axios';
-import { useSearchParams } from 'react-router-dom';
+import { useChat } from '../contexts/ChatContext';
 
 const ChatPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const { selectedUserId } = useChat();
   const [user, setUser] = useState<UserResponseDto | null>(null);
   const [users, setUsers] = useState<UserResponseDto[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserResponseDto | null>(null);
@@ -23,7 +24,6 @@ const ChatPage: React.FC = () => {
   const handleReceiveMessage = useCallback((msg: any) => {
     try {
       const message = JSON.parse(msg.body);
-      console.log('Mensaje recibido:', message);
       if (selectedUser && 
           (message.senderId === selectedUser.id || message.receiverId === selectedUser.id)) {
         setMessages(prev => [...prev, message]);
@@ -40,27 +40,60 @@ const ChatPage: React.FC = () => {
         throw new Error('No hay token de autenticación');
       }
 
-      const response = await axios.get(`${BASE_BACKEND}/api/chat/users`, {
+      // Obtenemos todos los usuarios
+      const usersResponse = await axios.get(`${BASE_BACKEND}/api/chat/users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
-      if (response.data && Array.isArray(response.data)) {
-        const filteredUsers = response.data.filter((u: UserResponseDto) => u.id !== user?.id);
-        setUsers(filteredUsers);
-        console.log('Usuarios cargados:', filteredUsers);
+      if (usersResponse.data && Array.isArray(usersResponse.data)) {
+        // Filtramos los usuarios que no son el usuario actual
+        const filteredUsers = usersResponse.data.filter((u: UserResponseDto) => u.id !== user?.id);
+        
+        // Para cada usuario, verificamos si hay mensajes entre el usuario actual y ese usuario
+        const usersWithMessages = await Promise.all(
+          filteredUsers.map(async (otherUser: UserResponseDto) => {
+            try {
+              const messagesResponse = await axios.get(
+                `${BASE_BACKEND}/api/chat/messages?userId=${otherUser.id}`,
+                {
+                  headers: {
+                    'Authorization': `Bearer ${token}`
+                  }
+                }
+              );
+              
+              // Verificamos si hay mensajes entre el usuario actual y el otro usuario
+              const hasMessagesWithCurrentUser = messagesResponse.data.some((msg: any) => 
+                (msg.senderId === user?.id && msg.receiverId === otherUser.id) || 
+                (msg.senderId === otherUser.id && msg.receiverId === user?.id)
+              );
+              
+              // Incluimos al usuario si tiene mensajes o si es el vendedor seleccionado
+              return (hasMessagesWithCurrentUser || otherUser.id === selectedUserId) ? otherUser : null;
+            } catch (error) {
+              console.error(`Error al obtener mensajes para usuario ${otherUser.id}:`, error);
+              // Si hay error pero es el vendedor seleccionado, lo incluimos de todos modos
+              return otherUser.id === selectedUserId ? otherUser : null;
+            }
+          })
+        );
 
-        // Manejar la redirección desde productos
-        const userIdFromUrl = searchParams.get('userId');
-        if (userIdFromUrl) {
-          const userToSelect = filteredUsers.find(u => u.id === parseInt(userIdFromUrl));
+        // Filtramos los usuarios que tienen mensajes con el usuario actual o son el vendedor seleccionado
+        const usersWithChats = usersWithMessages.filter((user): user is UserResponseDto => user !== null);
+        
+        setUsers(usersWithChats);
+
+        if (selectedUserId && !selectedUser) {
+          const userToSelect = usersWithChats.find(u => u.id === selectedUserId);
           if (userToSelect) {
-            handleUserSelect(userToSelect);
+            setSelectedUser(userToSelect);
+            loadMessages(userToSelect.id);
           }
         }
       } else {
-        console.error('Respuesta inválida del servidor:', response.data);
+        console.error('Respuesta inválida del servidor:', usersResponse.data);
         throw new Error('Formato de respuesta inválido');
       }
     } catch (error: any) {
@@ -71,7 +104,7 @@ const ChatPage: React.FC = () => {
       }
       throw new Error('Error al cargar usuarios');
     }
-  }, [user?.id, BASE_BACKEND, searchParams]);
+  }, [user?.id, BASE_BACKEND, selectedUserId, selectedUser]);
 
   const initializeChat = useCallback(async () => {
     try {
@@ -82,11 +115,10 @@ const ChatPage: React.FC = () => {
         return;
       }
 
-      const userData = await getUserById(getIdFromToken());
+      const userData = await getProfile();
       setUser(userData);
       
       // Conectar al WebSocket
-      console.log('Conectando al WebSocket con usuario:', userData.name);
       WebSocketService.connect(userData.name, userData.id, handleReceiveMessage);
       setIsConnected(true);
       
@@ -124,7 +156,6 @@ const ChatPage: React.FC = () => {
           (msg.senderId === user?.id || msg.receiverId === user?.id)
         );
         setMessages(filteredMessages);
-        console.log('Mensajes cargados:', filteredMessages);
         setTimeout(scrollToBottom, 100); // Pequeño delay para asegurar que los mensajes se hayan renderizado
       }
     } catch (error) {
@@ -145,7 +176,6 @@ const ChatPage: React.FC = () => {
     initializeChat();
 
     return () => {
-      console.log('Desconectando WebSocket...');
       WebSocketService.disconnect();
       setIsConnected(false);
     };
@@ -174,7 +204,6 @@ const ChatPage: React.FC = () => {
         setIsConnected(true);
       }
 
-      console.log('Enviando mensaje a:', selectedUser.name);
       WebSocketService.sendMessage(user.id, selectedUser.id, message);
       setMessage('');
     } catch (err) {
