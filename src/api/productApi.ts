@@ -22,6 +22,15 @@ export const updateProduct = async (productId: number, product: ProductCreateDto
   return response.data;
 };
 
+export const markProductAsSold = async (productId: number): Promise<void> => {
+  await axios.patch(`/api/products/${productId}/sold`, {}, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
 export const getProducts = async (): Promise<Product[]> => {
   const response = await axios.get('/api/products');
   return response.data;
