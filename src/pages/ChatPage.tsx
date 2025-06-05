@@ -1,8 +1,7 @@
-// src/pages/ChatPage.tsx
 import { Box, Button, TextField, Typography, List, ListItem, ListItemButton, ListItemText, Paper } from '@mui/material';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import WebSocketService from '../services/WebSocketService';
-import { getProfile } from '../api/userServices';
+import { getIdFromToken, getUserById } from '../api/userServices';
 import { UserResponseDto } from '../types/userTypes';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
@@ -83,7 +82,7 @@ const ChatPage: React.FC = () => {
         return;
       }
 
-      const userData = await getProfile(token);
+      const userData = await getUserById(getIdFromToken(), token);
       setUser(userData);
       
       // Conectar al WebSocket

@@ -1,25 +1,14 @@
 import { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import { getProductBySellerId } from '../api/productApi';
 import ProductList from '../components/products/ProductList';
 import type { Product } from '../types/productTypes';
+import { getIdFromToken } from '../api/userServices';
 
 export default function MyProducts() {
   const [listProducts, setListProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getSellerIdFromToken = () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error("No token found");
-      return null;
-    }
-
-    const decodedToken = jwtDecode<any>(token);
-    return decodedToken.id;
-  };
-
-  const sellerId = getSellerIdFromToken();
+  const sellerId = getIdFromToken();
 
   useEffect(() => {
     const fetchProducts = async () => {

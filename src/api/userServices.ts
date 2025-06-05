@@ -1,9 +1,21 @@
 import axios from './axiosConfig';
+import { jwtDecode } from 'jwt-decode';
 import { UserResponseDto } from '../types/userTypes';
 
-export async function getProfile(token: string): Promise<UserResponseDto> {
+export const getIdFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error("No token found");
+      return null;
+    }
+
+    const decodedToken = jwtDecode<any>(token);
+    return decodedToken.id;
+};
+
+export async function getUserById(id: number, token: string): Promise<UserResponseDto> {
   try {
-    const response = await axios.get('/api/users/profile', {
+    const response = await axios.get(`/api/users/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

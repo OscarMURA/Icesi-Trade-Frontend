@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getProfile } from '../api/userServices';
+import { getUserById } from '../api/userServices';
+import { getIdFromToken } from '../api/userServices';
 import { UserResponseDto } from '../types/userTypes';
 import UserInfo from '../components/profile/UserInfo';
 import UserEditForm from '../components/profile/UserEditForm';
@@ -12,7 +13,7 @@ export default function Profile() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      getProfile(token)
+      getUserById(getIdFromToken(), token)
         .then(setProfile)
         .catch(err => setError(err.message));
     } else {
