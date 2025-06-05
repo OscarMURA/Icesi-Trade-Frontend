@@ -25,7 +25,12 @@ export default function ProductInfo({
       <h2>{product.title}</h2>
       <p>{product.description}</p>
       <h3>{`$${product.price}`}</h3>
-
+      <div className="mb-2">
+        <span className="font-semibold text-gray-700">Estado: </span>
+        <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-bold text-xs">
+          {product.status}
+        </span>
+      </div>
       <Stack direction="row" spacing={2} mt={2}>
         {onEdit && <Button variant="outlined" onClick={onEdit}>Editar</Button>}
         {onDelete && <Button variant="outlined" color="error" onClick={onDelete}>Eliminar</Button>}
