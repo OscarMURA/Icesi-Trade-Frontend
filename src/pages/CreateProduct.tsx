@@ -10,7 +10,7 @@ export default function CreateProduct() {
   const [form, setForm] = useState<Omit<ProductCreateDto, 'sellerId'>>({
     title: "",
     description: "",
-    status: "Disponible",
+    status: "Nuevo",
     price: 0,
     location: "",
     categoryId: 0, // categoryId es un número
@@ -88,6 +88,20 @@ export default function CreateProduct() {
           variant="outlined"
           required
         />
+        <FormControl fullWidth variant="outlined">
+          <InputLabel>Estado</InputLabel>
+          <Select
+            name="status"
+            value={form.status}
+            onChange={(e) => setForm({ ...form, status: e.target.value })}
+            required
+            label="Estado"
+          >
+            <MenuItem value="Nuevo">Nuevo</MenuItem>
+            <MenuItem value="Usado">Usado</MenuItem>
+            <MenuItem value="Seminuevo">Seminuevo</MenuItem>
+          </Select>
+        </FormControl>
         <FormControl fullWidth variant="outlined">
           <InputLabel>Selecciona una categoría</InputLabel>
           <Select
