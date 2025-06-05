@@ -1,16 +1,35 @@
 import { useState, useEffect } from 'react';
-import { getProducts } from '../api/productApi';
+import { jwtDecode } from 'jwt-decode';
+import { getProductBySellerId } from '../api/productApi';
 import ProductList from '../components/products/ProductList';
 import type { Product } from '../types/productTypes';
 
-export default function ProductsManager() {
+export default function MyProducts() {
   const [listProducts, setListProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const getSellerIdFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error("No token found");
+      return null;
+    }
+
+    const decodedToken = jwtDecode<any>(token);
+    return decodedToken.id;
+  };
+
+  const sellerId = getSellerIdFromToken();
+
   useEffect(() => {
     const fetchProducts = async () => {
+      if (!sellerId) {
+        console.error("Seller ID is undefined");
+        return;
+      }
+
       try {
-        const products = await getProducts();
+        const products = await getProductBySellerId(sellerId);
         setListProducts(products);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -20,7 +39,7 @@ export default function ProductsManager() {
     };
 
     fetchProducts();
-  }, []);
+  }, [sellerId]);
 
   return (
     <div className="container mx-auto px-4 py-8">

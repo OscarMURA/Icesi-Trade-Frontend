@@ -10,6 +10,7 @@ import Register from '../pages/Register';
 import Layout from '../components/utils/Layout';
 import CreateProduct from '../pages/CreateProduct';
 import ChatPage from '../pages/ChatPage';
+import MyProducts from '../pages/MyProducts';
 
 const router = createBrowserRouter([
   { 
@@ -36,7 +37,8 @@ const router = createBrowserRouter([
           { path: 'products', element: <ProductList /> },
           { path: 'products/:id', element: <ProductDetail /> },
           { path: 'create-product', element: <CreateProduct /> },
-          { path: 'chat', element: <ChatPage /> }
+          { path: 'chat', element: <ChatPage /> },
+          { path: 'my-products', element: <MyProducts /> }
         ]
       },
       {

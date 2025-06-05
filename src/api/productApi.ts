@@ -10,3 +10,8 @@ export const getProducts = async (): Promise<Product[]> => {
   const response = await axios.get('/api/products');
   return response.data;
 };
+
+export const getProductBySellerId = async (sellerId: number): Promise<Product[]> => {
+  const response = await axios.get(`/api/products/seller/${sellerId}`);
+  return response.data;
+}

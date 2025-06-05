@@ -110,6 +110,12 @@ export default function Navbar() {
                     <span>Crear producto</span>
                   </Link>
                 </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                  <Link to="/g1/losbandalos/Icesi-Trade/my-products" className="cursor-pointer flex items-center md:hidden">
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    <span>Mis productos</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/g1/losbandalos/Icesi-Trade/chat" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100 md:hidden">
                     <MessageSquare className="mr-2 h-4 w-4" />
