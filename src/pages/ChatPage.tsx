@@ -131,9 +131,9 @@ const ChatPage: React.FC = () => {
   const handleUserSelect = async (selectedUser: UserResponseDto) => {
     setSelectedUser(selectedUser);
     setMessages([]);
-    if (user) {
-      await loadMessages(selectedUser.id);
-    }
+    
+    await loadMessages(selectedUser.id);
+    
   };
 
   useEffect(() => {
