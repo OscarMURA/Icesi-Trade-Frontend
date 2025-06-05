@@ -1,17 +1,18 @@
 import { Typography } from '@mui/joy';
 import { createBrowserRouter } from 'react-router-dom';
 import AuthWrapper from '../components/auth/AuthWrapper';
+import Layout from '../components/utils/Layout';
+import ChatPage from '../pages/ChatPage';
+import CreateProduct from '../pages/CreateProduct';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
+import MyProducts from '../pages/MyProducts';
 import ProductDetail from '../pages/ProductDetail';
 import ProductList from '../pages/ProductsManager';
 import Profile from '../pages/Profile';
 import Register from '../pages/Register';
-import Layout from '../components/utils/Layout';
-import CreateProduct from '../pages/CreateProduct';
-import ChatPage from '../pages/ChatPage';
-import MyProducts from '../pages/MyProducts';
 import ProductSearch from '../pages/ProductSearch';
+import MyFavoriteProducts from '../pages/MyFavoriteProducts';
 
 const router = createBrowserRouter([
   { 
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
           { path: 'profile', element: <Profile /> },
           { path: 'products', element: <ProductList /> },
           { path: 'products/:id', element: <ProductDetail /> },
+          { path: 'my-favorites', element: <MyFavoriteProducts /> },
           { path: 'create-product', element: <CreateProduct /> },
           { path: 'chat', element: <ChatPage /> },
           { path: 'my-products', element: <MyProducts /> }
