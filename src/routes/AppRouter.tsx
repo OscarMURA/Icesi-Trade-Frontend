@@ -11,6 +11,7 @@ import Layout from '../components/utils/Layout';
 import CreateProduct from '../pages/CreateProduct';
 import ChatPage from '../pages/ChatPage';
 import MyProducts from '../pages/MyProducts';
+import ProductSearch from '../pages/ProductSearch';
 
 const router = createBrowserRouter([
   { 
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: 'register',
         element: <Register />
+      },
+      {
+        path: 'search',
+        element: <ProductSearch />
       },
       {
         path: '',

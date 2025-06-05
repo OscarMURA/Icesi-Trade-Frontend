@@ -2,6 +2,31 @@ import axios from './axiosConfig';
 import { Product, ProductCreateDto } from '../types/productTypes';
 import { getToken } from './userServices';
 
+export interface ProductFilters {
+  sellerId?: number;
+  categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  status?: string;
+  location?: string;
+  search?: string;
+}
+
+export const searchProducts = async (filters: ProductFilters): Promise<Product[]> => {
+  const params = new URLSearchParams();
+  
+  if (filters.sellerId) params.append('sellerId', filters.sellerId.toString());
+  if (filters.categoryId) params.append('categoryId', filters.categoryId.toString());
+  if (filters.minPrice) params.append('minPrice', filters.minPrice.toString());
+  if (filters.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
+  if (filters.status) params.append('status', filters.status);
+  if (filters.location) params.append('location', filters.location);
+  if (filters.search) params.append('search', filters.search);
+
+  const response = await axios.get(`/api/products?${params.toString()}`);
+  return response.data;
+};
+
 export const createProduct = async (product: Omit<ProductCreateDto, 'sellerId'>): Promise<any> => {
   const response = await axios.post('/api/products', product, {
     headers: {

@@ -45,6 +45,14 @@ export default function Navbar() {
           >
             Inicio
           </Link>
+          <Link 
+            to="/g1/losbandalos/Icesi-Trade/search" 
+            className={`text-sm font-medium transition-colors hover:text-blue-800 ${
+              isActive("/search") ? "text-blue-800" : "text-gray-700"
+            }`}
+          >
+            Buscar
+          </Link>
           {user && (
             <>
               <Link 
@@ -122,6 +130,12 @@ export default function Navbar() {
                     <span>Chat</span>
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/g1/losbandalos/Icesi-Trade/search" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100 md:hidden">
+                    <span>Buscar</span>
+                  </Link>
+                </DropdownMenuItem>
+
                 <DropdownMenuSeparator className="bg-blue-200" />
                 <DropdownMenuItem 
                   onClick={handleLogout}

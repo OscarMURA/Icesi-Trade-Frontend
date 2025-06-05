@@ -61,5 +61,4 @@ export async function getProfile(): Promise<UserResponseDto> {
     throw new Error(error.response?.data?.message || 'Error al obtener perfil');
   }
 
-  
 }

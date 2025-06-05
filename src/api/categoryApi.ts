@@ -1,7 +1,16 @@
 import axios from './axiosConfig';
-import { Category } from '../types/categoryTypes';
+
+export interface Category {
+  id: number;
+  name: string;
+}
 
 export const getCategories = async (): Promise<Category[]> => {
-  const response = await axios.get('/api/categories');
-  return response.data;
+  try {
+    const response = await axios.get('/api/categories');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener categorías:', error);
+    return [];
+  }
 };
