@@ -1,4 +1,4 @@
-import { Typography, Card, CardContent, Button } from '@mui/joy';
+import { Typography, Card, CardContent, Button } from '@mui/material';
 import { UserResponseDto } from '../../types/userTypes';
 
 export default function UserInfo({
@@ -11,7 +11,7 @@ export default function UserInfo({
   return (
     <Card>
       <CardContent>
-        <Typography level="h4">Información Personal</Typography>
+        <Typography>Información Personal</Typography>
         <Typography>Nombre: {user.name}</Typography>
         <Typography>Correo: {user.email}</Typography>
         <Typography>Teléfono: {user.phone}</Typography>

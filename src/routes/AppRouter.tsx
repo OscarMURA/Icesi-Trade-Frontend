@@ -1,4 +1,4 @@
-import { Typography } from '@mui/joy';
+import { Typography } from '@mui/material';
 import { createBrowserRouter } from 'react-router-dom';
 import AuthWrapper from '../components/auth/AuthWrapper';
 import Layout from '../components/utils/Layout';

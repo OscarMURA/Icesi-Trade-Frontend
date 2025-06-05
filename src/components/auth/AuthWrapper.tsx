@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Typography } from '@mui/joy';
+import { Typography } from '@mui/material';
 import { AuthContext } from '../../contexts/AuthContext';
 
 type Props = {

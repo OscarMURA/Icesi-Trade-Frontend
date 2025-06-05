@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Input, Button, Card, CardContent, Stack } from '@mui/joy';
+import { Input, Button, Card, CardContent, Stack } from '@mui/material';
 import { UserResponseDto } from '../../types/userTypes';
 import { updateUser } from '../../api/userServices';
 

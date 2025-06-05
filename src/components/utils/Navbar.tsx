@@ -1,170 +1,162 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingBag, User, LogOut, MessageSquare, Plus, LogIn, UserPlus } from "lucide-react";
-
-import { Button } from "../../components/ui/button";
-import { Avatar, AvatarFallback} from "../../components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "../../components/ui/dropdown-menu";
-
-import useAuth from "../../hooks/useAuth";
+import {
+  AppBar,
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from '@mui/material';
+import {
+  Bell,
+  Flower2,
+  LogOut,
+  MessageSquare,
+  ShoppingBag,
+  User
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import useAuth from '../../hooks/useAuth';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleLogout = () => {
+    handleMenuClose();
     logout();
-    navigate("/g1/losbandalos/Icesi-Trade/login");
-  };
-  
-  const getInitials = (name: string) => {
-    if (!name) return "U";
-    return name.split(" ").map(word => word[0]).join("").toUpperCase().substring(0, 2);
+    navigate('/g1/losbandalos/Icesi-Trade/login');
   };
 
-  const isActive = (path: string) => {
-    return location.pathname.includes(path);
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-[#B5D8E6] shadow-sm">
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6">
-        <Link to="/g1/losbandalos/Icesi-Trade" className="flex items-center gap-2">
-          <ShoppingBag className="h-6 w-6 text-blue-800" />
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-800 to-blue-900 bg-clip-text text-transparent">
+    <AppBar position="sticky" sx={{ backgroundColor: '#fefefe', borderBottom: '1px solid #e0e0e0', boxShadow: 0 }}>
+      <Toolbar sx={{ justifyContent: 'space-between', px: 3 }}>
+        {/* Logo */}
+        <Box display="flex" alignItems="center" gap={1}>
+          <Flower2 size={22} color="rgb(15, 37, 97)" />
+          <Typography
+            variant="h6"
+            component={Link}
+            to="/g1/losbandalos/Icesi-Trade"
+            sx={{
+              textDecoration: 'none',
+              background: 'linear-gradient(to right,rgb(15, 37, 97), #1e40af)',
+              WebkitBackgroundClip: 'text',
+              color: 'transparent',
+              fontWeight: 700,
+            }}
+          >
             Icesi Trade
-          </span>
-        </Link>
+          </Typography>
+        </Box>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <Link 
-            to="/g1/losbandalos/Icesi-Trade" 
-            className={`text-sm font-medium transition-colors hover:text-blue-800 ${
-              location.pathname === "/g1/losbandalos/Icesi-Trade" ? "text-blue-800" : "text-gray-700"
-            }`}
-          >
-            Inicio
-          </Link>
-          <Link 
-            to="/g1/losbandalos/Icesi-Trade/search" 
-            className={`text-sm font-medium transition-colors hover:text-blue-800 ${
-              isActive("/search") ? "text-blue-800" : "text-gray-700"
-            }`}
-          >
-            Buscar
-          </Link>
-          {user && (
-            <>
-              <Link 
-                to="/g1/losbandalos/Icesi-Trade/products" 
-                className={`text-sm font-medium transition-colors hover:text-blue-800 ${
-                  isActive("/products") ? "text-blue-800" : "text-gray-700"
-                }`}
-              >
-                Productos
-              </Link>
-              <Link 
-                to="/g1/losbandalos/Icesi-Trade/create-product" 
-                className={`text-sm font-medium transition-colors hover:text-blue-800 ${
-                  isActive("/create-product") ? "text-blue-800" : "text-gray-700"
-                }`}
-              >
-                Crear Producto
-              </Link>
-              <Link 
-                to="/g1/losbandalos/Icesi-Trade/chat" 
-                className={`text-sm font-medium transition-colors hover:text-blue-800 ${
-                  isActive("/chat") ? "text-blue-800" : "text-gray-700"
-                }`}
-              >
-                Chat
-              </Link>
-            </>
-          )}
-        </nav>
+        {/* Usuario no autenticado */}
+        {!user && (
+          <Box display="flex" gap={1}>
+            <Button
+              component={Link}
+              to="/g1/losbandalos/Icesi-Trade/login"
+              variant="outlined"
+              sx={{ borderRadius: '999px' }}
+            >
+              Iniciar sesión
+            </Button>
+            <Button
+              component={Link}
+              to="/g1/losbandalos/Icesi-Trade/register"
+              variant="contained"
+              sx={{ backgroundColor: '#1e40af', borderRadius: '999px' }}
+            >
+              Registrarse
+            </Button>
+          </Box>
+        )}
 
-        <div className="flex items-center gap-2">
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="rounded-full h-10 w-10 p-0">
-                  <Avatar className="h-9 w-9 border-2 border-blue-100">
-                    <AvatarFallback className="bg-blue-100 text-blue-800">
-                      {getInitials(user.name || "Usuario")}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-[#B5D8E6] border-blue-200 rounded-xl shadow-lg">
-                <div className="flex flex-col space-y-1 p-2">
-                  <p className="text-sm font-medium leading-none text-black">{user.name || "Usuario"}</p>
-                </div>
-                <DropdownMenuSeparator className="bg-blue-200" />
-                <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/profile" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Mi perfil</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/products" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100">
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    <span>Productos</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/create-product" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100 md:hidden">
-                    <Plus className="mr-2 h-4 w-4" />
-                    <span>Crear producto</span>
-                  </Link>
-                </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/my-products" className="cursor-pointer flex items-center md:hidden">
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    <span>Mis productos</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/chat" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100 md:hidden">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    <span>Chat</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/search" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100 md:hidden">
-                    <span>Buscar</span>
-                  </Link>
-                </DropdownMenuItem>
+        {/* Usuario autenticado */}
+        {user && (
+          <Box display="flex" alignItems="center" gap={2}>
+            {/* Notificaciones (campanita) */}
+            <IconButton
+              component={Link}
+              to="/g1/losbandalos/Icesi-Trade/notifications"
+              sx={{ position: 'relative' }}
+            >
+              <Badge
+                color="error"
+                variant="dot"
+                overlap="circular"
+                sx={{ '& .MuiBadge-badge': { top: 4, right: 4 } }}
+              >
+                <Bell className="text-gray-600" />
+              </Badge>
+            </IconButton>
 
-                <DropdownMenuSeparator className="bg-blue-200" />
-                <DropdownMenuItem 
-                  onClick={handleLogout}
-                  className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Cerrar sesión</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" asChild>
-                <Link to="/g1/losbandalos/Icesi-Trade/login" className="flex items-center gap-2">
-                  <LogIn className="h-4 w-4" />
-                  <span className="hidden sm:inline">Iniciar sesión</span>
-                </Link>
-              </Button>
-              
-              <Button variant="default" className="bg-blue-600 hover:bg-blue-700" asChild>
-                <Link to="/g1/losbandalos/Icesi-Trade/register" className="flex items-center gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  <span className="hidden sm:inline">Registrarse</span>
-                </Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-    </header>
+            {/* Chat */}
+            <IconButton component={Link} to="/g1/losbandalos/Icesi-Trade/chat">
+              <MessageSquare className="text-gray-600" />
+            </IconButton>
+
+            {/* Menú de usuario */}
+            <IconButton onClick={handleMenuOpen}>
+              <Avatar sx={{ bgcolor: '#cfe8fc', color: '#1e40af' }}>
+                {getInitials(user.name)}
+              </Avatar>
+            </IconButton>
+
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleMenuClose}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+              <MenuItem
+                component={Link}
+                to="/g1/losbandalos/Icesi-Trade/profile"
+                onClick={handleMenuClose}
+              >
+                <User fontSize={16} style={{ marginRight: 8 }} />
+                Perfil
+              </MenuItem>
+              <MenuItem
+                component={Link}
+                to="/g1/losbandalos/Icesi-Trade/my-products"
+                onClick={handleMenuClose}
+              >
+                <ShoppingBag fontSize={16} style={{ marginRight: 8 }} />
+                Mis productos
+              </MenuItem>
+              <MenuItem onClick={handleLogout}>
+                <LogOut fontSize={16} style={{ marginRight: 8 }} />
+                Cerrar sesión
+              </MenuItem>
+            </Menu>
+          </Box>
+        )}
+      </Toolbar>
+    </AppBar>
   );
 }
