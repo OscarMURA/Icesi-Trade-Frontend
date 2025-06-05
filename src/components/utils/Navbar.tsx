@@ -16,7 +16,9 @@ import {
   LogOut,
   MessageSquare,
   ShoppingBag,
-  User
+  User,
+  Search,
+  PackagePlus,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -99,6 +101,28 @@ export default function Navbar() {
         {/* Usuario autenticado */}
         {user && (
           <Box display="flex" alignItems="center" gap={2}>
+            {/* Botón de búsqueda */}
+            <Button
+              component={Link}
+              to="/g1/losbandalos/Icesi-Trade/search"
+              variant="outlined"
+              startIcon={<Search size={18} />}
+              sx={{ borderRadius: '999px' }}
+            >
+              Buscar
+            </Button>
+
+            {/* Botón de crear productos */}
+            <Button
+              component={Link}
+              to="/g1/losbandalos/Icesi-Trade/create-product"
+              variant="contained"
+              startIcon={<PackagePlus size={18} />}
+              sx={{ backgroundColor: '#1e40af', borderRadius: '999px' }}
+            >
+              Crear
+            </Button>
+
             {/* Notificaciones (campanita) */}
             <IconButton
               component={Link}

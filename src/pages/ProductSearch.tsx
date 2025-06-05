@@ -5,6 +5,7 @@ import QueryForm from '../components/queries/QueryForm';
 import FilterForm, { FilterOptions } from '../components/queries/FilterForm';
 import ProductList from '../components/products/ProductList';
 import { Product } from '../types/productTypes';
+import { Search } from 'lucide-react';
 
 export default function ProductSearch() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -39,9 +40,8 @@ export default function ProductSearch() {
     loadInitialProducts();
   }, []);
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    await performSearch(query, activeFilters);
+  const handleSearch = async () => {
+    await performSearch(searchQuery, activeFilters);
   };
 
   const handleFilter = async (filters: FilterOptions) => {
@@ -67,37 +67,36 @@ export default function ProductSearch() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-          Búsqueda de Productos
+          Buscar productos
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-1">
-          <FilterForm onFilter={handleFilter} categories={categories} />
-        </div>
-        
-        <div className="lg:col-span-3">
-          <div className="mb-6">
-            <QueryForm onSearch={handleSearch} />
-          </div>
-          
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow-md p-4 animate-pulse">
-                  <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <ProductList products={searchResults} />
-          )}
-        </div>
+      <div className="max-w-2xl mx-auto flex flex-col gap-4 mb-8">
+        <QueryForm onSearch={handleSearch} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <FilterForm onFilter={handleFilter} categories={categories} />
+        <button
+          onClick={handleSearch}
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl w-full text-xl shadow-lg transition"
+        >
+          <Search size={22} /> Buscar
+        </button>
       </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg shadow-md p-4 animate-pulse">
+              <div className="w-full h-48 bg-gray-200 rounded-lg mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ProductList products={searchResults} />
+      )}
     </div>
   );
 } 
