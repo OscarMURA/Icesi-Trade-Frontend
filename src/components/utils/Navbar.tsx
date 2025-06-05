@@ -27,11 +27,11 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-[#B5D8E6] shadow-sm">
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
         <Link to="/g1/losbandalos/Icesi-Trade" className="flex items-center gap-2">
-          <ShoppingBag className="h-6 w-6 text-blue-600" />
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+          <ShoppingBag className="h-6 w-6 text-blue-800" />
+          <span className="text-xl font-bold bg-gradient-to-r from-blue-800 to-blue-900 bg-clip-text text-transparent">
             Icesi Trade
           </span>
         </Link>
@@ -39,8 +39,8 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-6">
           <Link 
             to="/g1/losbandalos/Icesi-Trade" 
-            className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-              location.pathname === "/g1/losbandalos/Icesi-Trade" ? "text-blue-600" : "text-gray-600"
+            className={`text-sm font-medium transition-colors hover:text-blue-800 ${
+              location.pathname === "/g1/losbandalos/Icesi-Trade" ? "text-blue-800" : "text-gray-700"
             }`}
           >
             Inicio
@@ -48,17 +48,25 @@ export default function Navbar() {
           {user && (
             <>
               <Link 
+                to="/g1/losbandalos/Icesi-Trade/products" 
+                className={`text-sm font-medium transition-colors hover:text-blue-800 ${
+                  isActive("/products") ? "text-blue-800" : "text-gray-700"
+                }`}
+              >
+                Productos
+              </Link>
+              <Link 
                 to="/g1/losbandalos/Icesi-Trade/create-product" 
-                className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                  isActive("/create-product") ? "text-blue-600" : "text-gray-600"
+                className={`text-sm font-medium transition-colors hover:text-blue-800 ${
+                  isActive("/create-product") ? "text-blue-800" : "text-gray-700"
                 }`}
               >
                 Crear Producto
               </Link>
               <Link 
                 to="/g1/losbandalos/Icesi-Trade/chat" 
-                className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                  isActive("/chat") ? "text-blue-600" : "text-gray-600"
+                className={`text-sm font-medium transition-colors hover:text-blue-800 ${
+                  isActive("/chat") ? "text-blue-800" : "text-gray-700"
                 }`}
               >
                 Chat
@@ -79,32 +87,40 @@ export default function Navbar() {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-56 bg-[#B5D8E6] border-blue-200 rounded-xl shadow-lg">
                 <div className="flex flex-col space-y-1 p-2">
-                  <p className="text-sm font-medium leading-none">{user.name || "Usuario"}</p>
-                  <p className="text-xs leading-none text-gray-500">{user.email}</p>
+                  <p className="text-sm font-medium leading-none text-black">{user.name || "Usuario"}</p>
                 </div>
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-blue-200" />
                 <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/profile" className="cursor-pointer flex items-center">
+                  <Link to="/g1/losbandalos/Icesi-Trade/profile" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100">
                     <User className="mr-2 h-4 w-4" />
                     <span>Mi perfil</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/create-product" className="cursor-pointer flex items-center md:hidden">
+                  <Link to="/g1/losbandalos/Icesi-Trade/products" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100">
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    <span>Productos</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/g1/losbandalos/Icesi-Trade/create-product" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100 md:hidden">
                     <Plus className="mr-2 h-4 w-4" />
                     <span>Crear producto</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/g1/losbandalos/Icesi-Trade/chat" className="cursor-pointer flex items-center md:hidden">
+                  <Link to="/g1/losbandalos/Icesi-Trade/chat" className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100 md:hidden">
                     <MessageSquare className="mr-2 h-4 w-4" />
                     <span>Chat</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer text-red-600" onClick={handleLogout}>
+                <DropdownMenuSeparator className="bg-blue-200" />
+                <DropdownMenuItem 
+                  onClick={handleLogout}
+                  className="cursor-pointer flex items-center text-blue-800 hover:text-blue-900 hover:bg-blue-100"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Cerrar sesión</span>
                 </DropdownMenuItem>
