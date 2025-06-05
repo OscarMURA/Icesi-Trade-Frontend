@@ -24,7 +24,6 @@ const ChatPage: React.FC = () => {
   const handleReceiveMessage = useCallback((msg: any) => {
     try {
       const message = JSON.parse(msg.body);
-      console.log('Mensaje recibido:', message);
       if (selectedUser && 
           (message.senderId === selectedUser.id || message.receiverId === selectedUser.id)) {
         setMessages(prev => [...prev, message]);
@@ -85,7 +84,6 @@ const ChatPage: React.FC = () => {
         const usersWithChats = usersWithMessages.filter((user): user is UserResponseDto => user !== null);
         
         setUsers(usersWithChats);
-        console.log('Usuarios con mensajes cargados:', usersWithChats);
 
         if (selectedUserId && !selectedUser) {
           const userToSelect = usersWithChats.find(u => u.id === selectedUserId);
@@ -121,7 +119,6 @@ const ChatPage: React.FC = () => {
       setUser(userData);
       
       // Conectar al WebSocket
-      console.log('Conectando al WebSocket con usuario:', userData.name);
       WebSocketService.connect(userData.name, userData.id, handleReceiveMessage);
       setIsConnected(true);
       
@@ -159,7 +156,6 @@ const ChatPage: React.FC = () => {
           (msg.senderId === user?.id || msg.receiverId === user?.id)
         );
         setMessages(filteredMessages);
-        console.log('Mensajes cargados:', filteredMessages);
         setTimeout(scrollToBottom, 100); // Pequeño delay para asegurar que los mensajes se hayan renderizado
       }
     } catch (error) {
@@ -180,7 +176,6 @@ const ChatPage: React.FC = () => {
     initializeChat();
 
     return () => {
-      console.log('Desconectando WebSocket...');
       WebSocketService.disconnect();
       setIsConnected(false);
     };
@@ -209,7 +204,6 @@ const ChatPage: React.FC = () => {
         setIsConnected(true);
       }
 
-      console.log('Enviando mensaje a:', selectedUser.name);
       WebSocketService.sendMessage(user.id, selectedUser.id, message);
       setMessage('');
     } catch (err) {
