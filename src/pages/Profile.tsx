@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { UserResponseDto } from '../types/userTypes';
 import UserInfo from '../components/profile/UserInfo';
 import UserEditForm from '../components/profile/UserEditForm';
+import { getUserById } from '../api/userServices';
+import { getIdFromToken, getToken } from '../api/userServices';
 
 export default function Profile() {
   const [profile, setProfile] = useState<UserResponseDto | null>(null);
@@ -13,6 +15,19 @@ export default function Profile() {
     setProfile(updatedUser);
     setEditing(false);
   };
+
+  useEffect(() => {
+    if (getToken()) {
+      getUserById(getIdFromToken())
+        .then(setProfile)
+        .catch((error) => {
+          console.error('Error al obtener el perfil:', error);
+          setProfile(null);
+        });
+    } else {
+      console.error('No se encontró el token de autenticación');
+      setProfile(null);
+    }}, []);
 
   if (!profile) return <p>Cargando...</p>;
 

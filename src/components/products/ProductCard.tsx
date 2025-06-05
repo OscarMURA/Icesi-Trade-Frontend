@@ -13,6 +13,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const { user } = useAuth();
   const [editing, setEditing] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [offerPrice, setOfferPrice] = useState('');
 
   const isOwner = user && product.sellerId === getIdFromToken();
 
@@ -62,7 +63,7 @@ export default function ProductCard({ product }: { product: Product }) {
     try {
       await markProductAsSold(product.id);
       alert("Producto marcado como vendido.");
-      window.location.reload(); // o actualiza el estado local
+      window.location.reload(); 
     } catch (err : any) {
       alert("Error al marcar como vendido.");
       console.error(err);
@@ -86,18 +87,52 @@ export default function ProductCard({ product }: { product: Product }) {
     }
   };  
 
+  const handleSendOffer = () => {
+    if (!offerPrice || isNaN(Number(offerPrice))) {
+      alert("Por favor ingresa un precio válido.");
+      return;
+    }
+  
+    const offer = {
+      userId: getIdFromToken(),
+      productId: product.id,
+      proposedPrice: parseFloat(offerPrice)
+    };
+  
+    console.log("Oferta enviada:", offer);
+  
+    // Aquí llamarías a tu API para guardar la oferta (aún por implementar)
+    alert("Oferta enviada exitosamente.");
+    setOfferPrice('');
+  };
+  
   return (
     <div>
       {!editing ? (
-        <ProductInfo
-          product={product}
-          onEdit={isOwner ? handleEdit : undefined}
-          onDelete={isOwner ? handleDelete : undefined}
-          onMarkAsSold={isOwner && !product.isSold ? handleMarkAsSold : undefined}
-          onToggleFavorite={!isOwner && user ? handleToggleFavorite : undefined}
-          isFavorite={isFavorite}
-          showFavorite={!isOwner && !!user}
-        />
+        <>
+          <ProductInfo
+            product={product}
+            onEdit={isOwner ? handleEdit : undefined}
+            onDelete={isOwner ? handleDelete : undefined}
+            onMarkAsSold={isOwner && !product.isSold ? handleMarkAsSold : undefined}
+            onToggleFavorite={!isOwner && user ? handleToggleFavorite : undefined}
+            isFavorite={isFavorite}
+            showFavorite={!isOwner && !!user}
+          />
+  
+          {!isOwner && user && (
+            <div style={{ marginTop: '1rem' }}>
+              <h4>Haz una oferta</h4>
+              <input
+                type="number"
+                placeholder="Precio ofrecido"
+                value={offerPrice}
+                onChange={(e) => setOfferPrice(e.target.value)}
+              />
+              <button onClick={handleSendOffer}>Enviar oferta</button>
+            </div>
+          )}
+        </>
       ) : (
         <ProductEditForm
           product={product}
@@ -106,5 +141,5 @@ export default function ProductCard({ product }: { product: Product }) {
         />
       )}
     </div>
-  );
+  );  
 }

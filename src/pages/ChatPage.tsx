@@ -82,7 +82,7 @@ const ChatPage: React.FC = () => {
         return;
       }
 
-      const userData = await getUserById(getIdFromToken(), token);
+      const userData = await getUserById(getIdFromToken());
       setUser(userData);
       
       // Conectar al WebSocket

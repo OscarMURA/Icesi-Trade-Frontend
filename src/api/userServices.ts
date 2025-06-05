@@ -22,11 +22,11 @@ export const getIdFromToken = () => {
     return decodedToken.id;
 };
 
-export async function getUserById(id: number, token: string): Promise<UserResponseDto> {
+export async function getUserById(id: number): Promise<UserResponseDto> {
   try {
     const response = await axios.get(`/api/users/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${getToken()}`,
       },
     });
     return response.data;
