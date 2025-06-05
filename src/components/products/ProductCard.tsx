@@ -4,11 +4,13 @@ import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import axios from "axios";
+import { useChat } from "../../context/ChatContext";
 
 export default function ProductCard({ product }: { product: Product }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isCurrentUserSeller, setIsCurrentUserSeller] = useState(false);
+  const { setSelectedUser } = useChat();
 
   useEffect(() => {
     const fetchSeller = async () => {
@@ -32,7 +34,8 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const handleChatClick = () => {
     if (isCurrentUserSeller) return;
-    navigate(`/g1/losbandalos/Icesi-Trade/chat?userId=${product.sellerId}`);
+    setSelectedUser(product.sellerId);
+    navigate('/g1/losbandalos/Icesi-Trade/chat');
   };
 
   return (

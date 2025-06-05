@@ -5,10 +5,10 @@ import WebSocketService from '../services/WebSocketService';
 import { getProfile } from '../api/userServices';
 import { UserResponseDto } from '../types/userTypes';
 import axios from 'axios';
-import { useSearchParams } from 'react-router-dom';
+import { useChat } from '../context/ChatContext';
 
 const ChatPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const { selectedUserId } = useChat();
   const [user, setUser] = useState<UserResponseDto | null>(null);
   const [users, setUsers] = useState<UserResponseDto[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserResponseDto | null>(null);
@@ -52,12 +52,11 @@ const ChatPage: React.FC = () => {
         setUsers(filteredUsers);
         console.log('Usuarios cargados:', filteredUsers);
 
-        // Manejar la redirección desde productos
-        const userIdFromUrl = searchParams.get('userId');
-        if (userIdFromUrl) {
-          const userToSelect = filteredUsers.find(u => u.id === parseInt(userIdFromUrl));
+        if (selectedUserId && !selectedUser) {
+          const userToSelect = filteredUsers.find(u => u.id === selectedUserId);
           if (userToSelect) {
-            handleUserSelect(userToSelect);
+            setSelectedUser(userToSelect);
+            loadMessages(userToSelect.id);
           }
         }
       } else {
@@ -72,7 +71,7 @@ const ChatPage: React.FC = () => {
       }
       throw new Error('Error al cargar usuarios');
     }
-  }, [user?.id, BASE_BACKEND, searchParams]);
+  }, [user?.id, BASE_BACKEND, selectedUserId, selectedUser]);
 
   const initializeChat = useCallback(async () => {
     try {

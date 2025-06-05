@@ -1,12 +1,15 @@
 import { AuthProvider } from './contexts/AuthProvider';
 import router from './routes/AppRouter';
 import { RouterProvider } from 'react-router'
+import { ChatProvider } from './context/ChatContext';
 
 function App() {
   return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <ChatProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ChatProvider>
   );
 }
 
