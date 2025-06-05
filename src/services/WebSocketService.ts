@@ -1,3 +1,4 @@
+// src/services/WebSocketService.ts
 import { Client } from '@stomp/stompjs';
 
 class WebSocketService {

@@ -5,8 +5,10 @@ import WebSocketService from '../services/WebSocketService';
 import { getProfile } from '../api/userServices';
 import { UserResponseDto } from '../types/userTypes';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 
 const ChatPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const [user, setUser] = useState<UserResponseDto | null>(null);
   const [users, setUsers] = useState<UserResponseDto[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserResponseDto | null>(null);
@@ -17,7 +19,6 @@ const ChatPage: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
 
   const BASE_BACKEND = import.meta.env.VITE_BASE_URL;
-
 
   const handleReceiveMessage = useCallback((msg: any) => {
     try {
@@ -49,6 +50,15 @@ const ChatPage: React.FC = () => {
         const filteredUsers = response.data.filter((u: UserResponseDto) => u.id !== user?.id);
         setUsers(filteredUsers);
         console.log('Usuarios cargados:', filteredUsers);
+
+        // Manejar la redirección desde productos
+        const userIdFromUrl = searchParams.get('userId');
+        if (userIdFromUrl) {
+          const userToSelect = filteredUsers.find(u => u.id === parseInt(userIdFromUrl));
+          if (userToSelect) {
+            handleUserSelect(userToSelect);
+          }
+        }
       } else {
         console.error('Respuesta inválida del servidor:', response.data);
         throw new Error('Formato de respuesta inválido');
@@ -61,7 +71,7 @@ const ChatPage: React.FC = () => {
       }
       throw new Error('Error al cargar usuarios');
     }
-  }, [user?.id, BASE_BACKEND]);
+  }, [user?.id, BASE_BACKEND, searchParams]);
 
   const initializeChat = useCallback(async () => {
     try {

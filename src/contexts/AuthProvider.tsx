@@ -2,6 +2,7 @@ import { useState, useEffect, ReactNode } from 'react';
 import { AuthContext } from './AuthContext';
 
 type User = {
+    
   name: string;
   email: string;
   role: string;
