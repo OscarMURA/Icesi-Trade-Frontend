@@ -54,6 +54,8 @@ export default function ProductEditForm({
 
       if (image) {
         imageUrl = await uploadImage(image);
+      } else {
+        imageUrl = product.imageUrl || '';
       }
 
       const updatedProduct = { ...product, ...form, imageUrl };
@@ -117,6 +119,11 @@ export default function ProductEditForm({
           accept="image/*"
           onChange={handleImageChange}
         />
+        {product.imageUrl && !image && (
+          <Typography variant="body2" color="textSecondary">
+        Imagen actual: <a href={product.imageUrl} target="_blank" rel="noopener noreferrer">Ver imagen</a>
+          </Typography>
+        )}
       </div>
 
       {preview && (
