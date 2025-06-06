@@ -13,6 +13,7 @@ import Profile from '../pages/Profile';
 import Register from '../pages/Register';
 import ProductSearch from '../pages/ProductSearch';
 import MyFavoriteProducts from '../pages/MyFavoriteProducts';
+import MySales from '../pages/MySales';
 
 const router = createBrowserRouter([
   { 
@@ -45,7 +46,8 @@ const router = createBrowserRouter([
           { path: 'my-favorites', element: <MyFavoriteProducts /> },
           { path: 'create-product', element: <CreateProduct /> },
           { path: 'chat', element: <ChatPage /> },
-          { path: 'my-products', element: <MyProducts /> }
+          { path: 'my-products', element: <MyProducts /> },
+          { path: 'my-sales', element: <MySales /> }
         ]
       },
       {

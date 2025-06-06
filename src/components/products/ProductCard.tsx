@@ -9,13 +9,15 @@ import { Product } from '../../types/productTypes';
 import ProductEditForm from './ProductEditForm';
 import ProductInfo from './ProductInfo';
 import { SaleCreate } from '../../types/saleTypes';
+import ProductOffers from './ProductOffers';
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, hideOffersAndEdit }: { product: Product, hideOffersAndEdit?: boolean }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [editing, setEditing] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [offerPrice, setOfferPrice] = useState('');
+  const [showOffers, setShowOffers] = useState(false);
 
   const isOwner = user && product.sellerId === getIdFromToken();
 
@@ -122,7 +124,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <>
           <ProductInfo
             product={product}
-            onEdit={isOwner ? handleEdit : undefined}
+            onEdit={isOwner && !hideOffersAndEdit ? handleEdit : undefined}
             onDelete={isOwner ? handleDelete : undefined}
             onMarkAsSold={isOwner && !product.isSold ? handleMarkAsSold : undefined}
             onToggleFavorite={!isOwner && user ? handleToggleFavorite : undefined}
@@ -130,6 +132,14 @@ export default function ProductCard({ product }: { product: Product }) {
             showFavorite={!isOwner && !!user}
           />
   
+          {isOwner && !hideOffersAndEdit && (
+            <div style={{ marginTop: '1rem' }}>
+              <button onClick={() => setShowOffers(true)}>
+                Ver ofertas recibidas
+              </button>
+            </div>
+          )}
+
           {!isOwner && user && (
             <div style={{ marginTop: '1rem' }}>
               <h4>Haz una oferta</h4>
@@ -141,6 +151,13 @@ export default function ProductCard({ product }: { product: Product }) {
               />
               <button onClick={handleSendOffer}>Enviar oferta</button>
             </div>
+          )}
+
+          {showOffers && (
+            <ProductOffers
+              productId={product.id}
+              onClose={() => setShowOffers(false)}
+            />
           )}
         </>
       ) : (

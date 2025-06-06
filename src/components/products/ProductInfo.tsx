@@ -7,7 +7,6 @@ export default function ProductInfo({
   product,
   onEdit,
   onDelete,
-  onMarkAsSold,
   onToggleFavorite,
   isFavorite,
   showFavorite,
@@ -34,9 +33,6 @@ export default function ProductInfo({
       <Stack direction="row" spacing={2} mt={2}>
         {onEdit && <Button variant="outlined" onClick={onEdit}>Editar</Button>}
         {onDelete && <Button variant="outlined" color="error" onClick={onDelete}>Eliminar</Button>}
-        {onMarkAsSold && !product.isSold && (
-          <Button variant="contained" color="success" onClick={onMarkAsSold}>Marcar como vendido</Button>
-        )}
         {showFavorite && onToggleFavorite && (
           <IconButton onClick={onToggleFavorite} color="primary">
             {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
