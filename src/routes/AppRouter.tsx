@@ -14,6 +14,7 @@ import Register from '../pages/Register';
 import ProductSearch from '../pages/ProductSearch';
 import MyFavoriteProducts from '../pages/MyFavoriteProducts';
 import MySales from '../pages/MySales';
+import MyPurchases from '../pages/MyPurchases';
 
 const router = createBrowserRouter([
   { 
@@ -47,7 +48,8 @@ const router = createBrowserRouter([
           { path: 'create-product', element: <CreateProduct /> },
           { path: 'chat', element: <ChatPage /> },
           { path: 'my-products', element: <MyProducts /> },
-          { path: 'my-sales', element: <MySales /> }
+          { path: 'my-sales', element: <MySales /> },
+          { path: 'my-purchases', element: <MyPurchases /> }
         ]
       },
       {

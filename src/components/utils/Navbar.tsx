@@ -134,6 +134,17 @@ export default function Navbar() {
               Mis ventas
             </Button>
 
+            {/* Botón de mis compras */}
+            <Button
+              component={Link}
+              to="/g1/losbandalos/Icesi-Trade/my-purchases"
+              variant="outlined"
+              startIcon={<ShoppingBag size={18} />}
+              sx={{ borderRadius: '999px' }}
+            >
+              Mis compras
+            </Button>
+
             {/* Notificaciones (campanita) */}
             <IconButton
               component={Link}
@@ -191,6 +202,14 @@ export default function Navbar() {
               >
                 <ShoppingBag fontSize={16} style={{ marginRight: 8 }} />
                 Mis ventas
+              </MenuItem>
+              <MenuItem
+                component={Link}
+                to="/g1/losbandalos/Icesi-Trade/my-purchases"
+                onClick={handleMenuClose}
+              >
+                <ShoppingBag fontSize={16} style={{ marginRight: 8 }} />
+                Mis compras
               </MenuItem>
               <MenuItem
                 component={Link}

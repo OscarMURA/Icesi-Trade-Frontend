@@ -140,7 +140,7 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
             </div>
           )}
 
-          {!isOwner && user && (
+          {!isOwner && user && !hideOffersAndEdit && (
             <div style={{ marginTop: '1rem' }}>
               <h4>Haz una oferta</h4>
               <input
