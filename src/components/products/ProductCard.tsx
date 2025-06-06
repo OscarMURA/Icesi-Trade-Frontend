@@ -10,10 +10,13 @@ import ProductEditForm from './ProductEditForm';
 import ProductInfo from './ProductInfo';
 import { SaleCreate } from '../../types/saleTypes';
 import ProductOffers from './ProductOffers';
+import { Button } from '@mui/material';
+import { useChat } from '../../contexts/ChatContext';
 
 export default function ProductCard({ product, hideOffersAndEdit }: { product: Product, hideOffersAndEdit?: boolean }) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { setSelectedUser, setInputMessage } = useChat();
   const [editing, setEditing] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [offerPrice, setOfferPrice] = useState('');
@@ -34,6 +37,8 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
     };
     fetchFavorites();
   }, [product.id, user]);
+
+  const isCurrentUserSeller = Number(product.sellerId) === Number(getIdFromToken());
 
   const handleEdit = () => setEditing(true);
   const handleCancel = () => setEditing(false);
@@ -117,7 +122,16 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
         alert("Error al enviar oferta.");
       });
   };
-  
+
+  const handleChatClick = () => {
+    if (isCurrentUserSeller) return;
+    setSelectedUser(product.sellerId);
+    if (setInputMessage) {
+      setInputMessage(`Buenas,Como estas? Me interesa este producto: ${product.title}`);
+    }
+    navigate('/g1/losbandalos/Icesi-Trade/chat');
+  };
+
   return (
     <div>
       {!editing ? (
@@ -158,6 +172,18 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
               productId={product.id}
               onClose={() => setShowOffers(false)}
             />
+          )}
+
+          {/* Botón de chatear con el vendedor */}
+          {!product.isSold && user && !isCurrentUserSeller && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleChatClick}
+              sx={{ mt: 1 }}
+            >
+              Chatear con el vendedor
+            </Button>
           )}
         </>
       ) : (

@@ -8,7 +8,7 @@ import axios from 'axios';
 import { useChat } from '../contexts/ChatContext';
 
 const ChatPage: React.FC = () => {
-  const { selectedUserId } = useChat();
+  const { selectedUserId, inputMessage, setInputMessage } = useChat();
   const [user, setUser] = useState<UserResponseDto | null>(null);
   const [users, setUsers] = useState<UserResponseDto[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserResponseDto | null>(null);
@@ -181,6 +181,13 @@ const ChatPage: React.FC = () => {
     };
   }, [initializeChat]);
 
+  useEffect(() => {
+    if (inputMessage) {
+      setMessage(inputMessage);
+      setInputMessage('');
+    }
+  }, [inputMessage, setInputMessage]);
+
   const handleRetry = async () => {
     setError(null);
     setIsLoading(true);
@@ -206,6 +213,7 @@ const ChatPage: React.FC = () => {
 
       WebSocketService.sendMessage(user.id, selectedUser.id, message);
       setMessage('');
+      setInputMessage('');
     } catch (err) {
       console.error('Error al enviar mensaje:', err);
       setError('Error al enviar mensaje');
