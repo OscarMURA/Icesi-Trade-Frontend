@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { ChatBubbleOutline } from '@mui/icons-material';
 import { useChat } from '../../contexts/ChatContext';
+import { addNotification } from '../../api/notificationApi';
 
 
 export default function ProductCard({
@@ -123,9 +124,16 @@ export default function ProductCard({
     console.log("Oferta enviada:", offer);
   
     createSale(offer)
-      .then(() => { 
+      .then(async () => { 
         alert("Oferta enviada exitosamente.");
         setOfferPrice('');
+        await addNotification({
+          createdAt: new Date().toISOString(),
+          typeId: 3,
+          read: false,
+          userId: product.sellerId,
+          message: `Has recibido una nueva oferta para tu producto: ${product.title}`,
+        });
       }
       )
       .catch((err: any) => {

@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { Notification } from '../types/notificationTypes';
 import { getNotifications, markNotificationAsRead } from '../api/notificationApi';
+import { getIdFromToken } from '../api/userServices';
 
 export default function UserNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -22,12 +23,12 @@ export default function UserNotifications() {
     const fetchNotifications = async () => {
       try {
         const data: Notification[] = await getNotifications();
-  
-        const sorted = data.sort(
+        const myId = getIdFromToken();
+        const onlyMine = data.filter(n => n.userId === myId);
+        const sorted = onlyMine.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
-  
         setNotifications(sorted);
       } catch (err) {
         console.error(err);
@@ -36,9 +37,8 @@ export default function UserNotifications() {
         setLoading(false);
       }
     };
-  
-    fetchNotifications(); // no olvides llamar la función
-  }, []);  
+    fetchNotifications();
+  }, []);
 
   const handleMarkAsRead = async (id: number) => {
     try {

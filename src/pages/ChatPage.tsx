@@ -216,9 +216,9 @@ const ChatPage: React.FC = () => {
       // Notificar al receptor del mensaje
       await addNotification({
         createdAt: new Date().toISOString(),
-        typeId: 1, // 1 = MESSAGE según tu tabla
+        typeId: 1, // 1 = MESSAGE
         read: false,
-        userId: selectedUser.id, // El receptor del mensaje
+        userId: selectedUser.id, // <-- El receptor del mensaje
         message: `Has recibido un mensaje de ${user.name}`,
       });
       setMessage('');
