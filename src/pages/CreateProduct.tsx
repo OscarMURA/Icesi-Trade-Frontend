@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { getCategories } from "../api/categoryApi";
 import { Category } from "../types/categoryTypes";
 import { createProduct } from "../api/productApi";
@@ -7,6 +8,7 @@ import { ProductCreateDto } from "../types/productTypes";
 import { Button, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress } from '@mui/material';
 
 export default function CreateProduct() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [form, setForm] = useState<Omit<ProductCreateDto, 'sellerId'>>({
     title: "",
@@ -38,7 +40,7 @@ export default function CreateProduct() {
       const data = await createProduct(form);
       console.log("Producto creado:", data);
       alert("Producto publicado con éxito");
-      setLoading(false);
+      navigate('/g1/losbandalos/Icesi-Trade/my-products');
     } catch (error) {
       setLoading(false);
       setError("Error al publicar el producto");
