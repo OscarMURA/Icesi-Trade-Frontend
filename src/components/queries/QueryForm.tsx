@@ -1,3 +1,5 @@
+import { TextField, Button, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface QueryFormProps {
   onSearch: (query: string) => void;
@@ -12,16 +14,35 @@ export default function QueryForm({ onSearch, searchQuery, setSearchQuery }: Que
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <input
+    <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '1rem', alignItems: 'center', width: '100%' }}>
+      <TextField
         type="text"
         id="search"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="border border-gray-300 rounded-2xl px-6 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition text-lg placeholder-gray-400"
         placeholder="Buscar productos..."
         autoComplete="off"
+        variant="outlined"
+        fullWidth
+        size="medium"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="action" />
+            </InputAdornment>
+          ),
+          style: { borderRadius: 16 }
+        }}
       />
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        size="medium"
+        sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 'bold', px: 4 }}
+      >
+        Buscar
+      </Button>
     </form>
   );
 } 
