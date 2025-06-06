@@ -59,7 +59,6 @@ export default function ProductEditForm({
       }
 
       const updatedProduct = { ...product, ...form, imageUrl };
-      console.log('Producto actualizado:', updatedProduct);
       onUpdate(updatedProduct);
     } catch (err) {
       console.error('Error al subir imagen:', err);
@@ -121,7 +120,7 @@ export default function ProductEditForm({
         />
         {product.imageUrl && !image && (
           <Typography variant="body2" color="textSecondary">
-        Imagen actual: <a href={product.imageUrl} target="_blank" rel="noopener noreferrer">Ver imagen</a>
+            Imagen actual: <a href={product.imageUrl} target="_blank" rel="noopener noreferrer">Ver imagen</a>
           </Typography>
         )}
       </div>

@@ -10,13 +10,28 @@ import ProductEditForm from './ProductEditForm';
 import ProductInfo from './ProductInfo';
 import { SaleCreate } from '../../types/saleTypes';
 import ProductOffers from './ProductOffers';
-import { Button } from '@mui/material';
+import {
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Stack,
+} from '@mui/material';
+import { ChatBubbleOutline } from '@mui/icons-material';
 import { useChat } from '../../contexts/ChatContext';
 
-export default function ProductCard({ product, hideOffersAndEdit }: { product: Product, hideOffersAndEdit?: boolean }) {
+
+export default function ProductCard({
+  product,
+  hideOffersAndEdit,
+}: {
+  product: Product;
+  hideOffersAndEdit?: boolean;
+}) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { setSelectedUser, setInputMessage } = useChat();
+
   const [editing, setEditing] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [offerPrice, setOfferPrice] = useState('');
@@ -28,17 +43,15 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
     const fetchFavorites = async () => {
       if (!user) return;
       try {
-        const favorites = await getFavoriteProductsByUser(); 
-        const found = favorites.some(fav => fav.productId === product.id);
+        const favorites = await getFavoriteProductsByUser();
+        const found = favorites.some((fav) => fav.productId === product.id);
         setIsFavorite(found);
       } catch (err) {
-        console.error("Error al cargar favoritos", err);
+        console.error('Error al cargar favoritos', err);
       }
     };
     fetchFavorites();
   }, [product.id, user]);
-
-  const isCurrentUserSeller = Number(product.sellerId) === Number(getIdFromToken());
 
   const handleEdit = () => setEditing(true);
   const handleCancel = () => setEditing(false);
@@ -46,24 +59,24 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
   const handleUpdate = async (updated: Product) => {
     try {
       await updateProduct(product.id, updated);
-      alert("Producto actualizado exitosamente.");
+      alert('Producto actualizado exitosamente.');
       setEditing(false);
     } catch (err) {
-      alert("Error al actualizar el producto.");
+      alert('Error al actualizar el producto.');
       console.error(err);
     }
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm("¿Seguro que deseas eliminar este producto?");
+    const confirmDelete = window.confirm('¿Seguro que deseas eliminar este producto?');
     if (!confirmDelete) return;
 
     try {
       await deleteProduct(product.id);
-      alert("Producto eliminado exitosamente.");
+      alert('Producto eliminado exitosamente.');
       navigate('/my-products');
-    } catch (err: any) {
-      alert("Error al eliminar el producto.");
+    } catch (err) {
+      alert('Error al eliminar el producto.');
       console.error(err);
     }
   };
@@ -71,10 +84,10 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
   const handleMarkAsSold = async () => {
     try {
       await markProductAsSold(product.id);
-      alert("Producto marcado como vendido.");
-      window.location.reload(); 
-    } catch (err: any) {
-      alert("Error al marcar como vendido.");
+      alert('Producto marcado como vendido.');
+      window.location.reload();
+    } catch (err) {
+      alert('Error al marcar como vendido.');
       console.error(err);
     }
   };
@@ -82,118 +95,124 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
   const handleToggleFavorite = async () => {
     const favorite = {
       userId: getIdFromToken(),
-      productId: product.id
+      productId: product.id,
     };
 
     try {
       await toggleFavoriteProduct(favorite);
-      setIsFavorite(prev => !prev);
-    } catch (err: any) {
-      alert("Error al actualizar favorito.");
+      setIsFavorite((prev) => !prev);
+    } catch (err) {
+      alert('Error al actualizar favorito.');
       console.error(err);
     }
   };
 
   const handleSendOffer = () => {
     if (!offerPrice || isNaN(Number(offerPrice))) {
-      alert("Por favor ingresa un precio válido.");
+      alert('Por favor ingresa un precio válido.');
       return;
     }
-  
+
     const offer: SaleCreate = {
       buyerId: getIdFromToken(),
       productId: product.id,
       price: parseFloat(offerPrice),
-      status: 'pending'
+      status: 'pending',
     };
-  
-    console.log("Oferta enviada:", offer);
-  
+
     createSale(offer)
-      .then(() => { 
-        alert("Oferta enviada exitosamente.");
+      .then(() => {
+        alert('Oferta enviada exitosamente.');
         setOfferPrice('');
-      }
-      )
-      .catch((err: any) => {
-        console.error("Error al enviar oferta:", err.response?.data || err.message);
-        alert("Error al enviar oferta.");
+      })
+      .catch((err) => {
+        console.error('Error al enviar oferta:', err);
+        alert('Error al enviar oferta.');
       });
   };
 
   const handleChatClick = () => {
-    if (isCurrentUserSeller) return;
+    if (isOwner) return;
     setSelectedUser(product.sellerId);
     if (setInputMessage) {
-      setInputMessage(`Buenas,Como estas? Me interesa este producto: ${product.title}`);
+      setInputMessage(`Buenas, ¿cómo estás? Me interesa este producto: ${product.title}`);
     }
     navigate('/g1/losbandalos/Icesi-Trade/chat');
   };
 
   return (
-    <div className="bg-white rounded shadow p-4">
-      {!editing ? (
-        <>
-          <ProductInfo
-            product={product}
-            onEdit={isOwner && !hideOffersAndEdit ? handleEdit : undefined}
-            onDelete={isOwner ? handleDelete : undefined}
-            onMarkAsSold={isOwner && !product.isSold ? handleMarkAsSold : undefined}
-            onToggleFavorite={!isOwner && user ? handleToggleFavorite : undefined}
-            isFavorite={isFavorite}
-            showFavorite={!isOwner && !!user}
-          />
-  
-          {isOwner && !hideOffersAndEdit && (
-            <div style={{ marginTop: '1rem' }}>
-              <button onClick={() => setShowOffers(true)}>
-                Ver ofertas recibidas
-              </button>
-            </div>
-          )}
-
-          {!isOwner && user && !hideOffersAndEdit && (
-            <div style={{ marginTop: '1rem' }}>
-              <h4>Haz una oferta</h4>
-              <input
-                type="number"
-                className="border px-2 py-1 mr-2 rounded"
-                placeholder="Precio ofrecido"
-                value={offerPrice}
-                onChange={(e) => setOfferPrice(e.target.value)}
-              />
-              <button onClick={handleSendOffer} className="bg-blue-500 text-white px-4 py-1 rounded">
-                Enviar oferta
-              </button>
-            </div>
-          )}
-
-          {showOffers && (
-            <ProductOffers
-              productId={product.id}
-              onClose={() => setShowOffers(false)}
+    <Card
+      sx={{
+        bgcolor: '#f8f0fb',
+        borderRadius: 3,
+        p: 2,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <CardContent sx={{ flexGrow: 1 }}>
+        {!editing ? (
+          <Stack spacing={2}>
+            <ProductInfo
+              product={product}
+              onEdit={isOwner && !hideOffersAndEdit ? handleEdit : undefined}
+              onDelete={isOwner ? handleDelete : undefined}
+              onMarkAsSold={isOwner && !product.isSold ? handleMarkAsSold : undefined}
+              onToggleFavorite={!isOwner && user ? handleToggleFavorite : undefined}
+              isFavorite={isFavorite}
+              showFavorite={!isOwner && !!user}
             />
-          )}
 
-          {/* Botón de chatear con el vendedor */}
-          {!product.isSold && user && !isCurrentUserSeller && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleChatClick}
-              sx={{ mt: 1 }}
-            >
-              Chatear con el vendedor
-            </Button>
-          )}
-        </>
-      ) : (
-        <ProductEditForm
-          product={product}
-          onCancel={handleCancel}
-          onUpdate={handleUpdate}
-        />
-      )}
-    </div>
+            {!isOwner && user && !hideOffersAndEdit && (
+              <Stack spacing={1}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <TextField
+                    type="number"
+                    label="Precio ofrecido"
+                    size="small"
+                    value={offerPrice}
+                    onChange={(e) => setOfferPrice(e.target.value)}
+                  />
+                  <Button variant="contained" color="secondary" onClick={handleSendOffer}>
+                    Enviar oferta
+                  </Button>
+                </Stack>
+              </Stack>
+            )}
+
+            {isOwner && !hideOffersAndEdit && (
+              <Button variant="outlined" onClick={() => setShowOffers(true)}>
+                Ver ofertas recibidas
+              </Button>
+            )}
+
+            {showOffers && (
+              <ProductOffers
+                productId={product.id}
+                onClose={() => setShowOffers(false)}
+              />
+            )}
+
+            {!product.isSold && user && !isOwner && (
+              <Button
+                variant="contained"
+                startIcon={<ChatBubbleOutline />}
+                onClick={handleChatClick}
+                sx={{ bgcolor: '#6a1b9a', '&:hover': { bgcolor: '#4a148c' } }}
+              >
+                Chatear con el vendedor
+              </Button>
+            )}
+          </Stack>
+        ) : (
+          <ProductEditForm
+            product={product}
+            onCancel={handleCancel}
+            onUpdate={handleUpdate}
+          />
+        )}
+      </CardContent>
+    </Card>
   );
 }

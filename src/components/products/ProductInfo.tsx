@@ -1,7 +1,11 @@
+// ProductInfo.tsx
 import { Product } from '../../types/productTypes';
-import { Button, Stack, IconButton } from '@mui/material';
+import { Button, Stack, IconButton, Typography, Box, Chip, CardMedia } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+
+const defaultImage =
+  'https://i.pinimg.com/originals/ea/5f/c9/ea5fc9680cec81756dcd5f12d63dc3f5.jpg';
 
 export default function ProductInfo({
   product,
@@ -20,34 +24,43 @@ export default function ProductInfo({
   showFavorite?: boolean;
 }) {
   return (
-    <div>
-      <h2>{product.title}</h2>
-      <p>{product.description}</p>
-      <h3>{`$${product.price}`}</h3>
-      <div className="mb-2">
-        <span className="font-semibold text-gray-700">Estado: </span>
-        <span className="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-bold text-xs">
-          {product.status}
-        </span>
-      </div>
-    <div className="bg-white shadow rounded p-4">
-      {product.imageUrl && (
-        <img
-          src={product.imageUrl}
-          alt={product.title}
-          className="w-full h-48 object-cover rounded mb-4"
+    <Box display="flex" flexDirection="column" height="100%">
+      <CardMedia
+        component="img"
+        image={product.imageUrl || defaultImage}
+        alt={product.title}
+        sx={{ height: 200, width: '100%', objectFit: 'cover', borderRadius: 2, mb: 2 }}
+      />
+
+      <Box px={1} flexGrow={1}>
+        <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
+          {product.title}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          {product.description}
+        </Typography>
+        <Typography variant="h6" color="primary">${product.price}</Typography>
+
+        <Chip
+          label={product.status}
+          color="info"
+          size="small"
+          sx={{ mt: 1, mb: 2 }}
         />
-      )}
-      
-      <Stack direction="row" spacing={2} mt={2}>
-        {onEdit && <Button variant="outlined" onClick={onEdit}>Editar</Button>}
-        {onDelete && <Button variant="outlined" color="error" onClick={onDelete}>Eliminar</Button>}
+
         {showFavorite && onToggleFavorite && (
           <IconButton onClick={onToggleFavorite} color="primary">
             {isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />}
           </IconButton>
         )}
-      </Stack>
-    </div></div>
+      </Box>
+
+      <Box px={1} pb={2}>
+        <Stack direction="row" spacing={2}>
+          {onEdit && <Button variant="outlined" fullWidth onClick={onEdit}>Editar</Button>}
+          {onDelete && <Button variant="outlined" fullWidth color="error" onClick={onDelete}>Eliminar</Button>}
+        </Stack>
+      </Box>
+    </Box>
   );
 }
