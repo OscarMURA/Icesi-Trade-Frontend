@@ -16,11 +16,20 @@ import {
   CardContent,
   TextField,
   Stack,
+  Box,        // Importado para un layout más flexible
+  Divider,    // Importado para separación visual
 } from '@mui/material';
-import { ChatBubbleOutline } from '@mui/icons-material';
+import { 
+  ChatBubbleOutline, 
+  Send,       // Icono para "Enviar Oferta"
+  VisibilityOutlined // Icono para "Ver Ofertas"
+} from '@mui/icons-material';
 import { useChat } from '../../contexts/ChatContext';
 import { addNotification } from '../../api/notificationApi';
 
+// Definimos el color principal para consistencia
+const primaryActionColor = '#6a1b9a'; // Morado intenso
+const primaryActionHoverColor = '#4a148c'; // Morado más oscuro para el hover
 
 export default function ProductCard({
   product,
@@ -40,6 +49,7 @@ export default function ProductCard({
 
   const isOwner = user && product.sellerId === getIdFromToken();
 
+  // --- Toda la lógica funcional se mantiene intacta ---
   useEffect(() => {
     const fetchFavorites = async () => {
       if (!user) return;
@@ -69,9 +79,7 @@ export default function ProductCard({
   };
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm('¿Seguro que deseas eliminar este producto?');
-    if (!confirmDelete) return;
-
+    if (!window.confirm('¿Seguro que deseas eliminar este producto?')) return;
     try {
       await deleteProduct(product.id);
       alert("Producto eliminado exitosamente.");
@@ -94,13 +102,8 @@ export default function ProductCard({
   };
 
   const handleToggleFavorite = async () => {
-    const favorite = {
-      userId: getIdFromToken(),
-      productId: product.id,
-    };
-
     try {
-      await toggleFavoriteProduct(favorite);
+      await toggleFavoriteProduct({ userId: getIdFromToken(), productId: product.id });
       setIsFavorite((prev) => !prev);
     } catch (err) {
       alert('Error al actualizar favorito.');
@@ -113,33 +116,27 @@ export default function ProductCard({
       alert('Por favor ingresa un precio válido.');
       return;
     }
-
     const offer: SaleCreate = {
       buyerId: getIdFromToken(),
       productId: product.id,
       price: parseFloat(offerPrice),
       status: 'pending',
     };
-  
-    console.log("Oferta enviada:", offer);
-  
-    createSale(offer)
-      .then(async () => { 
-        alert("Oferta enviada exitosamente.");
-        setOfferPrice('');
-        await addNotification({
-          createdAt: new Date().toISOString(),
-          typeId: 3,
-          read: false,
-          userId: product.sellerId,
-          message: `Has recibido una nueva oferta para tu producto: ${product.title}`,
-        });
-      }
-      )
-      .catch((err: any) => {
-        console.error("Error al enviar oferta:", err.response?.data || err.message);
-        alert("Error al enviar oferta.");
+    try {
+      await createSale(offer);
+      alert("Oferta enviada exitosamente.");
+      setOfferPrice('');
+      await addNotification({
+        createdAt: new Date().toISOString(),
+        typeId: 3,
+        read: false,
+        userId: product.sellerId,
+        message: `Has recibido una nueva oferta para tu producto: ${product.title}`,
       });
+    } catch (err: any) {
+      console.error("Error al enviar oferta:", err.response?.data || err.message);
+      alert("Error al enviar oferta.");
+    }
   };
 
   const handleChatClick = () => {
@@ -151,20 +148,24 @@ export default function ProductCard({
     navigate('/g1/losbandalos/Icesi-Trade/chat');
   };
 
+  // --- El JSX es donde aplicamos todas las mejoras de estilo ---
   return (
     <Card
       sx={{
-        bgcolor: '#f8f0fb',
-        borderRadius: 3,
+        bgcolor: '#fdfaff', // Un morado muy sutil, casi blanco
+        borderRadius: 4,    // Bordes más redondeados
         p: 2,
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)', // Sombra más suave
+        border: '1px solid #ede7f6' // Borde sutil del color del tema
       }}
     >
-      <CardContent sx={{ flexGrow: 1 }}>
+      {/* Usamos CardContent sin padding porque la Card ya lo tiene */}
+      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 0 }}>
         {!editing ? (
-          <Stack spacing={2}>
+          <Stack spacing={2.5} sx={{ flexGrow: 1 }}>
             <ProductInfo
               product={product}
               onEdit={isOwner && !hideOffersAndEdit ? handleEdit : undefined}
@@ -175,25 +176,39 @@ export default function ProductCard({
               showFavorite={!isOwner && !!user}
             />
 
+            {/* Espacio para que las acciones se vayan al final si hay espacio */}
+            <Box sx={{ flexGrow: 1 }} />
+
+            {(!isOwner || isOwner) && !hideOffersAndEdit && <Divider />}
+
             {!isOwner && user && !hideOffersAndEdit && (
-              <Stack spacing={1}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <TextField
-                    type="number"
-                    label="Precio ofrecido"
-                    size="small"
-                    value={offerPrice}
-                    onChange={(e) => setOfferPrice(e.target.value)}
-                  />
-                  <Button variant="contained" color="secondary" onClick={handleSendOffer}>
-                    Enviar oferta
-                  </Button>
-                </Stack>
-              </Stack>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Tu oferta"
+                  size="small"
+                  variant="outlined"
+                  value={offerPrice}
+                  onChange={(e) => setOfferPrice(e.target.value)}
+                />
+                <Button 
+                  variant="contained" 
+                  onClick={handleSendOffer}
+                  sx={{ bgcolor: primaryActionColor, '&:hover': { bgcolor: primaryActionHoverColor } }}
+                >
+                  <Send />
+                </Button>
+              </Box>
             )}
 
             {isOwner && !hideOffersAndEdit && (
-              <Button variant="outlined" onClick={() => setShowOffers(true)}>
+              <Button 
+                variant="outlined" 
+                onClick={() => setShowOffers(true)}
+                startIcon={<VisibilityOutlined />}
+                sx={{ color: primaryActionColor, borderColor: primaryActionColor }}
+              >
                 Ver ofertas recibidas
               </Button>
             )}
@@ -210,7 +225,8 @@ export default function ProductCard({
                 variant="contained"
                 startIcon={<ChatBubbleOutline />}
                 onClick={handleChatClick}
-                sx={{ bgcolor: '#6a1b9a', '&:hover': { bgcolor: '#4a148c' } }}
+                fullWidth
+                sx={{ bgcolor: primaryActionColor, '&:hover': { bgcolor: primaryActionHoverColor } }}
               >
                 Chatear con el vendedor
               </Button>

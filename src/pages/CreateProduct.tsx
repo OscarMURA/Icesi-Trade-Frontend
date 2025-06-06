@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { getCategories } from "../api/categoryApi";
 import { Category } from "../types/categoryTypes";
 import { createProduct } from "../api/productApi";
 import { uploadImage } from "../api/uploadImage";
 import { ProductCreateDto } from "../types/productTypes";
-import { Button, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress } from '@mui/material';
+import { useNavigate } from "react-router-dom";
+
+import { Button, TextField, MenuItem, Select, InputLabel, FormControl, CircularProgress, Stack, Typography } from '@mui/material';
 
 export default function CreateProduct() {
   const navigate = useNavigate();
@@ -50,13 +51,18 @@ export default function CreateProduct() {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Publicar nuevo producto</h2>
-      <form
+      {/* Usamos el componente Typography de MUI para consistencia */}
+      <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold', mb: 3 }}>
+        Publicar nuevo producto
+      </Typography>
+      {/* 2. Reemplazamos <form> por <Stack> y añadimos la prop 'spacing' */}
+      <Stack
+        component="form"
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="flex flex-col gap-4"
+        spacing={3} // 3. Esta prop añade un espacio consistente entre todos los campos.
       >
         <TextField
           label="Título"
@@ -118,6 +124,7 @@ export default function CreateProduct() {
             value={form.categoryId}
             onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })}
             required
+            label="Selecciona una categoría"
           >
             <MenuItem value={0} disabled>Selecciona una categoría</MenuItem>
             {categories.map((cat) => (
@@ -126,8 +133,10 @@ export default function CreateProduct() {
           </Select>
         </FormControl>
 
-        <div>
-          <label htmlFor="image-upload">Imagen del producto</label><br />
+        <FormControl>
+          <Typography variant="body1" component="label" htmlFor="image-upload" sx={{ mb: 1, fontWeight: 'medium' }}>
+            Imagen del producto
+          </Typography>
           <input
             id="image-upload"
             type="file"
@@ -138,7 +147,7 @@ export default function CreateProduct() {
               }
             }}
           />
-        </div>
+        </FormControl>
 
         <Button
           type="submit"
@@ -146,12 +155,14 @@ export default function CreateProduct() {
           color="primary"
           disabled={loading}
           fullWidth
+          // 4. El margen superior (mt) ya no es necesario, Stack lo maneja.
+          sx={{ py: 1.5, fontWeight: 'bold' }} 
         >
-          {loading ? <CircularProgress size={24} color="secondary" /> : "Publicar"}
+          {loading ? <CircularProgress size={24} color="inherit" /> : "Publicar"}
         </Button>
 
-        {error && <div className="text-red-500 mt-2">{error}</div>}
-      </form>
+        {error && <div className="text-red-500">{error}</div>}
+      </Stack>
     </div>
   );
 }

@@ -1,11 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
 import { loginRequest } from '../api/authApi';
 import { LogInDto } from '../types/authTypes';
 import useAuth from '../hooks/useAuth';
-import MessageToast from '../components/utils/MessageToast';
-import LoadingSpinner from '../components/utils/LoadingSpinner';
 
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  TextField, 
+  Button, 
+  CircularProgress, 
+  Alert,
+  InputAdornment,
+  IconButton,
+  Link,
+  Grid
+} from '@mui/material';
+import { MailOutline, LockOutlined, Visibility, VisibilityOff } from '@mui/icons-material';
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
@@ -14,6 +26,7 @@ export default function Login() {
   const [form, setForm] = useState<LogInDto>({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const location = useLocation();
   const from = location.state?.from?.pathname || '/g1/losbandalos/Icesi-Trade/products';
@@ -38,80 +51,113 @@ export default function Login() {
       if (!form.email || !form.password) {
         throw new Error('Por favor complete todos los campos');
       }
-
-      console.log('Intentando login con:', { email: form.email, password: '***' });
       const response = await loginRequest(form);
-      console.log('Respuesta del login:', response);
-
       if (!response || !response.token) {
         throw new Error('No se recibió un token válido del servidor');
       }
-
-      // Guardar el nombre de usuario y el token
       localStorage.setItem('username', response.name);
       localStorage.setItem('token', response.token);
-      
       login(response);
     } catch (err: any) {
-      console.error('Error en login:', err);
-      if (err.response) {
-        // Error del servidor
-        setError(err.response.data?.error || 'Error del servidor. Por favor intente nuevamente.');
-      } else if (err.message) {
-        // Error de validación o otro error
-        setError(err.message);
-      } else {
-        setError('Error al iniciar sesión. Por favor intente nuevamente.');
-      }
+      const errorMessage = err.response?.data?.error || err.message || 'Error al iniciar sesión. Por favor intente nuevamente.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-semibold text-center mb-4">Iniciar sesión</h2>
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: 'white',
+          padding: 4,
+          borderRadius: 2,
+          boxShadow: 3,
+        }}
+      >
+        <Typography component="h1" variant="h5" sx={{ mb: 1, fontWeight: 'bold' }}>
+          Bienvenido de nuevo
+        </Typography>
+        <Typography color="text.secondary" sx={{ mb: 3 }}>
+          Inicia sesión para continuar
+        </Typography>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium">Correo electrónico</label>
-          <input
-            type="email"
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Correo Electrónico"
             name="email"
+            autoComplete="email"
+            autoFocus
             value={form.email}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
             disabled={loading}
-            placeholder="ejemplo@correo.com"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <MailOutline />
+                </InputAdornment>
+              ),
+            }}
           />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium">Contraseña</label>
-          <input
-            type="password"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
             name="password"
+            label="Contraseña"
+            type={showPassword ? 'text' : 'password'}
+            id="password"
+            autoComplete="current-password"
             value={form.password}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
             disabled={loading}
-            placeholder="••••••••"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockOutlined />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => setShowPassword(!showPassword)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
           />
-        </div>
 
-        <button 
-          type="submit" 
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:bg-blue-300"
-          disabled={loading}
-        >
-          {loading ? 'Iniciando sesión...' : 'Ingresar'}
-        </button>
-      </form>
+          {error && (
+            <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+              {error}
+            </Alert>
+          )}
 
-      {loading && <LoadingSpinner />}
-      {error && <MessageToast message={error} type="error" />}
-    </div>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={loading}
+            sx={{ mt: 3, mb: 2, py: 1.5, fontWeight: 'bold' }}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Ingresar'}
+          </Button>
+        </Box>
+      </Box>
+    </Container>
   );
 }
