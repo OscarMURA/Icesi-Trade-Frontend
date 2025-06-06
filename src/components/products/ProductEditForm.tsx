@@ -1,7 +1,17 @@
 import { useState } from 'react';
 import { Product } from '../../types/productTypes';
-import { Button, TextField, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { uploadImage } from "../../api/uploadImage";
+import {
+  Button,
+  TextField,
+  Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
+  Typography,
+} from '@mui/material';
+import { uploadImage } from '../../api/uploadImage';
 
 export default function ProductEditForm({
   product,
@@ -19,31 +29,54 @@ export default function ProductEditForm({
     status: product.status,
     imageUrl: product.imageUrl || '',
   });
-    const [image, setImage] = useState<File | null>(null);
-  
+
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>(product.imageUrl || '');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-    if (image) {
-      uploadImage(image).then((url) => {
-        const updatedForm = { ...form, imageUrl: url };
-        onUpdate({ ...product, ...updatedForm });
-      });
-    } else {
-      onUpdate({ ...product, ...form });
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const selected = e.target.files[0];
+      setImage(selected);
+      setPreview(URL.createObjectURL(selected));
     }
   };
-  
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      let imageUrl = form.imageUrl;
+
+      if (image) {
+        imageUrl = await uploadImage(image);
+      }
+
+      const updatedProduct = { ...product, ...form, imageUrl };
+      console.log('Producto actualizado:', updatedProduct);
+      onUpdate(updatedProduct);
+    } catch (err) {
+      console.error('Error al subir imagen:', err);
+      setError('Error al subir imagen o actualizar producto');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Stack spacing={2}>
+      <Typography variant="h6">Editar producto</Typography>
+
       <TextField
         name="title"
         label="Título"
         value={form.title}
         onChange={handleChange}
+        fullWidth
       />
       <TextField
         name="description"
@@ -51,6 +84,8 @@ export default function ProductEditForm({
         value={form.description}
         onChange={handleChange}
         multiline
+        rows={4}
+        fullWidth
       />
       <TextField
         name="price"
@@ -58,6 +93,7 @@ export default function ProductEditForm({
         type="number"
         value={form.price}
         onChange={handleChange}
+        fullWidth
       />
       <FormControl fullWidth>
         <InputLabel>Estado</InputLabel>
@@ -72,22 +108,38 @@ export default function ProductEditForm({
           <MenuItem value="Seminuevo">Seminuevo</MenuItem>
         </Select>
       </FormControl>
+
       <div>
-          <label htmlFor="image-upload">Imagen del producto</label><br />
-          <input
-            id="image-upload"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                setImage(e.target.files[0]);
-              }
-            }}
-          />
+        <label htmlFor="image-upload">Imagen del producto</label><br />
+        <input
+          id="image-upload"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
       </div>
+
+      {preview && (
+        <img
+          src={preview}
+          alt="Vista previa"
+          style={{ width: '120px', borderRadius: 8, marginTop: 8 }}
+        />
+      )}
+
+      {error && <Typography color="error">{error}</Typography>}
+
       <Stack direction="row" spacing={2}>
-        <Button variant="contained" onClick={handleSubmit}>Guardar</Button>
-        <Button variant="outlined" onClick={onCancel}>Cancelar</Button>
+        <Button
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Guardar'}
+        </Button>
+        <Button variant="outlined" onClick={onCancel}>
+          Cancelar
+        </Button>
       </Stack>
     </Stack>
   );

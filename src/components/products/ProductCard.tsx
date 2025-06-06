@@ -115,14 +115,6 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div className="bg-white rounded shadow p-4">
-      {product.imageUrl && (
-        <img
-          src={product.imageUrl}
-          alt={product.title}
-          className="w-full h-48 object-cover rounded mb-4"
-        />
-      )}
-
       {!editing ? (
         <>
           <ProductInfo
