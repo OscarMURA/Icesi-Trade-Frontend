@@ -31,6 +31,15 @@ export default function ProductInfo({
           {product.status}
         </span>
       </div>
+    <div className="bg-white shadow rounded p-4">
+      {product.imageUrl && (
+        <img
+          src={product.imageUrl}
+          alt={product.title}
+          className="w-full h-48 object-cover rounded mb-4"
+        />
+      )}
+      
       <Stack direction="row" spacing={2} mt={2}>
         {onEdit && <Button variant="outlined" onClick={onEdit}>Editar</Button>}
         {onDelete && <Button variant="outlined" color="error" onClick={onDelete}>Eliminar</Button>}
@@ -43,6 +52,6 @@ export default function ProductInfo({
           </IconButton>
         )}
       </Stack>
-    </div>
+    </div></div>
   );
 }
