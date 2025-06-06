@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { loginRequest } from '../api/authApi';
 import { LogInDto } from '../types/authTypes';
 import useAuth from '../hooks/useAuth';
@@ -14,8 +14,6 @@ import {
   Alert,
   InputAdornment,
   IconButton,
-  Link,
-  Grid
 } from '@mui/material';
 import { MailOutline, LockOutlined, Visibility, VisibilityOff } from '@mui/icons-material';
 

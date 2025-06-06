@@ -1,7 +1,7 @@
 // Register.tsx
 
 import { useState } from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { registerRequest, loginRequest } from '../api/authApi';
 import { RegisterDto } from '../types/authTypes';
 import useAuth from '../hooks/useAuth';
@@ -17,8 +17,6 @@ import {
   Alert,
   InputAdornment,
   IconButton,
-  Link,
-  Grid
 } from '@mui/material';
 import { 
   PersonOutline, 
