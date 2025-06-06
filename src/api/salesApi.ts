@@ -1,7 +1,7 @@
 import { getToken } from './userServices';
 import axios from './axiosConfig';
 import { SaleCreate } from '../types/saleTypes';
-import { Sale } from '../types/saleTypes';
+import { Review } from '../types/reviewTypes';
 
 export const createSale = async ( sale : SaleCreate ): Promise<any> => {
     const response = await axios.post('/api/sales', sale, {
@@ -13,18 +13,31 @@ export const createSale = async ( sale : SaleCreate ): Promise<any> => {
     return response.data;
 };
 
-export const getLatestSaleByProductId = async (productId: number): Promise<Sale> => {
-  const response = await axios.get(`/api/sales/latest-by-product/${productId}`, {
+export const createReview = async (review: Review) => {
+  const response = await axios.post('/api/reviews', review, {
     headers: {
-      Authorization: `Bearer ${getToken()}`
-    }
+      Authorization: `Bearer ${getToken()}`,
+    },
   });
   return response.data;
 };
 
-export const getSalesByBuyerId = async (buyerId: number): Promise<Sale[]> => {
-  const res = await axios.get(`/api/sales/buyer/${buyerId}`, {
+export const getFirstBuyerByProductId = async (productId: number): Promise<any | null> => {
+  const response = await axios.get(`/api/sales`, {
+    params: { productId },
     headers: { Authorization: `Bearer ${getToken()}` },
   });
-  return res.data;
+
+  const sale = response.data.find((s: any) => s?.buyer?.id !== undefined);
+  return sale ? sale.buyer : null;
+};
+
+export const getReviewsByReviewer = async (reviewerId: number): Promise<Review[]> => {
+  const response = await axios.get('/api/reviews', {
+    params: { reviewerId },
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+  return response.data;
 };
