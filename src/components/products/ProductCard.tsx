@@ -83,9 +83,13 @@ export default function ProductCard({
     try {
       await deleteProduct(product.id);
       alert("Producto eliminado exitosamente.");
-      navigate('/my-products');
+      window.location.reload();
     } catch (err: any) {
-      alert("Error al eliminar el producto.");
+      if (err.response?.status === 500) {
+        alert("No se pudo eliminar el producto. Puede que tenga ventas asociadas o un error interno del servidor.");
+      } else {
+        alert("Error al eliminar el producto.");
+      }
       console.error(err);
     }
   };
