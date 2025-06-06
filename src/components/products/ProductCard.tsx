@@ -9,13 +9,19 @@ import { Product } from '../../types/productTypes';
 import ProductEditForm from './ProductEditForm';
 import ProductInfo from './ProductInfo';
 import { SaleCreate } from '../../types/saleTypes';
+import ProductOffers from './ProductOffers';
+import { Button } from '@mui/material';
+import { useChat } from '../../contexts/ChatContext';
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, hideOffersAndEdit }: { product: Product, hideOffersAndEdit?: boolean }) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { setSelectedUser, setInputMessage } = useChat();
   const [editing, setEditing] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [offerPrice, setOfferPrice] = useState('');
+  const [showOffers, setShowOffers] = useState(false);
+
   const isOwner = user && product.sellerId === getIdFromToken();
 
   useEffect(() => {
@@ -31,6 +37,8 @@ export default function ProductCard({ product }: { product: Product }) {
     };
     fetchFavorites();
   }, [product.id, user]);
+
+  const isCurrentUserSeller = Number(product.sellerId) === Number(getIdFromToken());
 
   const handleEdit = () => setEditing(true);
   const handleCancel = () => setEditing(false);
@@ -113,22 +121,40 @@ export default function ProductCard({ product }: { product: Product }) {
       });
   };
 
+  const handleChatClick = () => {
+    if (isCurrentUserSeller) return;
+    setSelectedUser(product.sellerId);
+    if (setInputMessage) {
+      setInputMessage(`Buenas,Como estas? Me interesa este producto: ${product.title}`);
+    }
+    navigate('/g1/losbandalos/Icesi-Trade/chat');
+  };
+
   return (
     <div className="bg-white rounded shadow p-4">
       {!editing ? (
         <>
           <ProductInfo
             product={product}
-            onEdit={isOwner ? handleEdit : undefined}
+            onEdit={isOwner && !hideOffersAndEdit ? handleEdit : undefined}
             onDelete={isOwner ? handleDelete : undefined}
             onMarkAsSold={isOwner && !product.isSold ? handleMarkAsSold : undefined}
             onToggleFavorite={!isOwner && user ? handleToggleFavorite : undefined}
             isFavorite={isFavorite}
             showFavorite={!isOwner && !!user}
           />
-          {!isOwner && user && (
-            <div className="mt-4">
-              <h4 className="font-medium">Haz una oferta</h4>
+  
+          {isOwner && !hideOffersAndEdit && (
+            <div style={{ marginTop: '1rem' }}>
+              <button onClick={() => setShowOffers(true)}>
+                Ver ofertas recibidas
+              </button>
+            </div>
+          )}
+
+          {!isOwner && user && !hideOffersAndEdit && (
+            <div style={{ marginTop: '1rem' }}>
+              <h4>Haz una oferta</h4>
               <input
                 type="number"
                 className="border px-2 py-1 mr-2 rounded"
@@ -140,6 +166,25 @@ export default function ProductCard({ product }: { product: Product }) {
                 Enviar oferta
               </button>
             </div>
+          )}
+
+          {showOffers && (
+            <ProductOffers
+              productId={product.id}
+              onClose={() => setShowOffers(false)}
+            />
+          )}
+
+          {/* Botón de chatear con el vendedor */}
+          {!product.isSold && user && !isCurrentUserSeller && (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleChatClick}
+              sx={{ mt: 1 }}
+            >
+              Chatear con el vendedor
+            </Button>
           )}
         </>
       ) : (
