@@ -30,7 +30,6 @@ export default function CreateProduct() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      // Primero subir imagen si hay
       if (image) {
         const url = await uploadImage(image);
         form.imageUrl = url;
