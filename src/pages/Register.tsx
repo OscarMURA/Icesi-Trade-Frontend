@@ -76,6 +76,7 @@ export default function Register() {
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           className="w-full border p-2 rounded"
           required
+          autoComplete="name"
         />
         <input
           type="email"
@@ -84,6 +85,7 @@ export default function Register() {
           onChange={(e) => setForm({ ...form, email: e.target.value })}
           className="w-full border p-2 rounded"
           required
+          autoComplete="username"
         />
         <input
           type="tel"
@@ -91,6 +93,7 @@ export default function Register() {
           value={form.phone}
           onChange={(e) => setForm({ ...form, phone: e.target.value })}
           className="w-full border p-2 rounded"
+          autoComplete="tel"
         />
         <input
           type="password"
@@ -99,6 +102,7 @@ export default function Register() {
           onChange={(e) => setForm({ ...form, password: e.target.value })}
           className="w-full border p-2 rounded"
           required
+          autoComplete="new-password"
         />
         <input
           type="password"
@@ -107,6 +111,7 @@ export default function Register() {
           onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
           className="w-full border p-2 rounded"
           required
+          autoComplete="new-password"
         />
         <button 
           type="submit" 
