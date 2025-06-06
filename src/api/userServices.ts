@@ -22,6 +22,16 @@ export const getIdFromToken = () => {
     return decodedToken.id;
 };
 
+export const getRolesFromToken = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error("No token found");
+      return [];
+    }
+    const decodedToken = jwtDecode<any>(token);
+    return decodedToken.roles || [];
+  };
+
 export async function getUserById(id: number): Promise<UserResponseDto> {
   try {
     const response = await axios.get(`/api/users/${id}`, {
@@ -61,4 +71,4 @@ export async function getProfile(): Promise<UserResponseDto> {
     throw new Error(error.response?.data?.message || 'Error al obtener perfil');
   }
 
-}
+};

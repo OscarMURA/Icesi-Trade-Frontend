@@ -23,6 +23,7 @@ import {
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
+import { getRolesFromToken } from '../../api/userServices';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -145,7 +146,25 @@ export default function Navbar() {
               Mis compras
             </Button>
 
-            {/* Notificaciones (campanita) */}
+            {/* Botón Admin (solo si tiene ROLE_ADMIN) */}
+            {getRolesFromToken()?.includes('ROLE_ADMIN') && (
+              <Button
+                component={Link}
+                to="/g1/losbandalos/Icesi-Trade/admin-panel"
+                variant="contained"
+                sx={{
+                  backgroundColor: '#f59e0b',
+                  borderRadius: '999px',
+                  fontWeight: 600,
+                  color: 'white',
+                  '&:hover': { backgroundColor: '#d97706' },
+                }}
+              >
+                Admin
+              </Button>
+            )}
+
+            {/* Notificaciones */}
             <IconButton
               component={Link}
               to="/g1/losbandalos/Icesi-Trade/notifications"

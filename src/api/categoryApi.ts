@@ -5,9 +5,15 @@ export interface Category {
   name: string;
 }
 
+const token = localStorage.getItem('token');
+
 export const getCategories = async (): Promise<Category[]> => {
   try {
-    const response = await axios.get('/api/categories');
+    const response = await axios.get('/api/categories', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error al obtener categorías:', error);

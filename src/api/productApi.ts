@@ -64,12 +64,12 @@ export const getProducts = async (): Promise<Product[]> => {
 export const getProductById = async (productId: number): Promise<Product> => {
   const response = await axios.get(`/api/products/${productId}`);
   return response.data;
-}
+};
 
 export const getProductBySellerId = async (sellerId: number): Promise<Product[]> => {
   const response = await axios.get(`/api/products?sellerId=${sellerId}`);
   return response.data;
-}
+};
 
 export const deleteProduct = async (productId: number): Promise<void> => {
   await axios.delete(`/api/products/${productId}`, {

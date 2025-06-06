@@ -16,6 +16,7 @@ import MyFavoriteProducts from '../pages/MyFavoriteProducts';
 import MySales from '../pages/MySales';
 import MyPurchases from '../pages/MyPurchases';
 import UserNotifications from '../components/UserNotifications';
+import AdminUserPanel from '../pages/AdminUserPanel';
 
 const router = createBrowserRouter([
   { 
@@ -51,7 +52,8 @@ const router = createBrowserRouter([
           { path: 'my-products', element: <MyProducts /> },
           { path: 'my-sales', element: <MySales /> },
           { path: 'my-purchases', element: <MyPurchases /> },
-          { path: 'notifications', element: <UserNotifications /> }
+          { path: 'notifications', element: <UserNotifications /> },
+          { path: 'admin-panel', element: <AdminUserPanel /> }
         ]
       },
       {
