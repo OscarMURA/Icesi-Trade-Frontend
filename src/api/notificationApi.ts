@@ -20,3 +20,12 @@ export const getNotifications = async (): Promise<Notification[]> => {
   });
   return response.data;
 };
+
+export const markNotificationAsRead = async (id: number): Promise<any> => {
+  const response = await axios.put(`/api/notifications/${id}/read`, {}, {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+  return response.data;
+};

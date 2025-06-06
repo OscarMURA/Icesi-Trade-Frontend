@@ -6,6 +6,7 @@ import { getProfile } from '../api/userServices';
 import { UserResponseDto } from '../types/userTypes';
 import axios from 'axios';
 import { useChat } from '../contexts/ChatContext';
+import { addNotification } from '../api/notificationApi';
 
 const ChatPage: React.FC = () => {
   const { selectedUserId, inputMessage, setInputMessage } = useChat();
@@ -212,6 +213,14 @@ const ChatPage: React.FC = () => {
       }
 
       WebSocketService.sendMessage(user.id, selectedUser.id, message);
+      // Notificar al receptor del mensaje
+      await addNotification({
+        createdAt: new Date().toISOString(),
+        typeId: 1, // 1 = MESSAGE según tu tabla
+        read: false,
+        userId: selectedUser.id, // El receptor del mensaje
+        message: `Has recibido un mensaje de ${user.name}`,
+      });
       setMessage('');
       setInputMessage('');
     } catch (err) {

@@ -5,16 +5,18 @@ import {
   Typography,
   CircularProgress,
   Stack,
-  Badge,
   Box,
+  Switch,
+  Button,
 } from '@mui/material';
 import { Notification } from '../types/notificationTypes';
-import { getNotifications } from '../api/notificationApi';
+import { getNotifications, markNotificationAsRead } from '../api/notificationApi';
 
 export default function UserNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showRead, setShowRead] = useState(false);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -38,16 +40,39 @@ export default function UserNotifications() {
     fetchNotifications(); // no olvides llamar la función
   }, []);  
 
+  const handleMarkAsRead = async (id: number) => {
+    try {
+      await markNotificationAsRead(id);
+      setNotifications((prev) =>
+        prev.map((notif) =>
+          notif.id === id ? { ...notif, read: true } : notif
+        )
+      );
+    } catch  {
+      alert('Error al marcar como leída');
+    }
+  };
+
+  const filteredNotifications = notifications.filter((notif) => notif.read === showRead);
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Stack spacing={2}>
       <Typography variant="h5">Tus notificaciones</Typography>
-      {notifications.length === 0 ? (
-        <Typography>No tienes notificaciones.</Typography>
+      <Box display="flex" alignItems="center" gap={2} mb={2}>
+        <Switch
+          checked={showRead}
+          onChange={() => setShowRead((prev) => !prev)}
+          color="primary"
+        />
+        <Typography>{showRead ? 'Leídas' : 'No leídas'}</Typography>
+      </Box>
+      {filteredNotifications.length === 0 ? (
+        <Typography>No tienes notificaciones {showRead ? 'leídas' : 'no leídas'}.</Typography>
       ) : (
-        notifications.map((notif) => (
+        filteredNotifications.map((notif) => (
           <Card
             key={notif.id}
             variant="outlined"
@@ -57,15 +82,17 @@ export default function UserNotifications() {
             }}
           >
             <CardContent>
-              <Box display="flex" justifyContent="space-between">
+              <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Typography variant="body1">{notif.message}</Typography>
                 {!notif.read && (
-                  <Badge
+                  <Button
+                    size="small"
+                    variant="contained"
                     color="primary"
-                    variant="dot"
-                    sx={{ mt: 0.5 }}
-                    title="No leída"
-                  />
+                    onClick={() => handleMarkAsRead(notif.id!)}
+                  >
+                    Marcar como leída
+                  </Button>
                 )}
               </Box>
               <Typography variant="caption" color="text.secondary">

@@ -12,6 +12,7 @@ import { SaleCreate } from '../../types/saleTypes';
 import ProductOffers from './ProductOffers';
 import { Button } from '@mui/material';
 import { useChat } from '../../contexts/ChatContext';
+import { addNotification } from '../../api/notificationApi';
 
 export default function ProductCard({ product, hideOffersAndEdit }: { product: Product, hideOffersAndEdit?: boolean }) {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
     try {
       await deleteProduct(product.id);
       alert("Producto eliminado exitosamente.");
-      navigate('/my-products');
+      navigate('/g1/losbandalos/Icesi-Trade/my-products');
     } catch (err: any) {
       alert("Error al eliminar el producto.");
       console.error(err);
@@ -94,7 +95,7 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
     }
   };
 
-  const handleSendOffer = () => {
+  const handleSendOffer = async () => {
     if (!offerPrice || isNaN(Number(offerPrice))) {
       alert("Por favor ingresa un precio válido.");
       return;
@@ -109,16 +110,22 @@ export default function ProductCard({ product, hideOffersAndEdit }: { product: P
   
     console.log("Oferta enviada:", offer);
   
-    createSale(offer)
-      .then(() => { 
-        alert("Oferta enviada exitosamente.");
-        setOfferPrice('');
-      }
-      )
-      .catch((err: any) => {
-        console.error("Error al enviar oferta:", err.response?.data || err.message);
-        alert("Error al enviar oferta.");
+    try {
+      await createSale(offer);
+      alert("Oferta enviada exitosamente.");
+      setOfferPrice('');
+      // Notificar al vendedor
+      await addNotification({
+        createdAt: new Date().toISOString(),
+        typeId: 3, // 3 = ORDER según tu tabla
+        read: false,
+        userId: product.sellerId, // El dueño del producto
+        message: `Has recibido una nueva oferta para tu producto: ${product.title}`,
       });
+    } catch (err: any) {
+      console.error("Error al enviar oferta:", err.response?.data || err.message);
+      alert("Error al enviar oferta.");
+    }
   };
 
   const handleChatClick = () => {
