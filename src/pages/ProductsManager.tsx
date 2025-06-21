@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react';
 import { getAvailableProducts } from '../api/productApi';
 import ProductList from '../components/products/ProductList';
 import type { Product } from '../types/productTypes';
-import { Box, Typography, Skeleton, Alert } from '@mui/material';
-import useAuth from '../hooks/useAuth';
+import { Box, Typography, Skeleton } from '@mui/material';
 
 export default function ProductsManager() {
-  const { isAuthenticated } = useAuth();
   const [listProducts, setListProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -46,14 +44,6 @@ export default function ProductsManager() {
 
             </Box>
 
-      {isAuthenticated && (
-        <Alert 
-          severity="info" 
-          sx={{ mb: 3, borderRadius: 2 }}
-        >
-          Se muestran automáticamente solo los productos disponibles (no vendidos) y que no son tuyos.
-        </Alert>
-      )}
 
       {isLoading ? (
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 3 }}>
