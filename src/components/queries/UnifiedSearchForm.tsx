@@ -76,6 +76,8 @@ export default function UnifiedSearchForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(searchQuery, filters);
+    // Ocultar filtros avanzados automáticamente después de buscar
+    setShowAdvancedFilters(false);
   };
 
   const handleClearSearch = () => {
@@ -257,26 +259,57 @@ export default function UnifiedSearchForm({
                     </Typography>
                   </Box>
                   
-                  <Badge badgeContent={activeFiltersCount} color="primary">
-                    <Button
-                      type="button"
-                      variant={showAdvancedFilters ? "contained" : "outlined"}
-                      onClick={toggleAdvancedFilters}
-                      endIcon={showAdvancedFilters ? <ExpandLess /> : <ExpandMore />}
-                      sx={{ 
-                        borderRadius: 2,
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        minWidth: 'auto',
-                        ...(showAdvancedFilters && {
-                          background: 'linear-gradient(135deg, #6a1b9a 0%, #8e24aa 100%)',
-                          boxShadow: '0 4px 12px rgba(106, 27, 154, 0.3)',
-                        })
-                      }}
-                    >
-                      {showAdvancedFilters ? 'Ocultar' : 'Mostrar'}
-                    </Button>
-                  </Badge>
+                  {/* Contenedor de botones lado a lado */}
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    {/* Botón Limpiar - solo aparece si hay contenido activo */}
+                    {hasAnyActiveContent && (
+                      <Button
+                        type="button"
+                        variant="outlined"
+                        onClick={handleClearAll}
+                        startIcon={<Clear />}
+                        sx={{ 
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          minWidth: 'auto',
+                          height: '40px', // Mismo tamaño que el botón Mostrar
+                          borderColor: 'text.secondary',
+                          color: 'text.secondary',
+                          '&:hover': {
+                            bgcolor: 'text.secondary',
+                            color: 'white',
+                            borderColor: 'text.secondary',
+                          }
+                        }}
+                      >
+                        Limpiar
+                      </Button>
+                    )}
+                    
+                    {/* Botón Mostrar/Ocultar con badge */}
+                    <Badge badgeContent={activeFiltersCount} color="primary">
+                      <Button
+                        type="button"
+                        variant={showAdvancedFilters ? "contained" : "outlined"}
+                        onClick={toggleAdvancedFilters}
+                        endIcon={showAdvancedFilters ? <ExpandLess /> : <ExpandMore />}
+                        sx={{ 
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          minWidth: 'auto',
+                          height: '40px',
+                          ...(showAdvancedFilters && {
+                            background: 'linear-gradient(135deg, #6a1b9a 0%, #8e24aa 100%)',
+                            boxShadow: '0 4px 12px rgba(106, 27, 154, 0.3)',
+                          })
+                        }}
+                      >
+                        {showAdvancedFilters ? 'Ocultar' : 'Mostrar'}
+                      </Button>
+                    </Badge>
+                  </Box>
                 </Box>
 
                 {/* Chips de filtros activos */}
@@ -468,37 +501,6 @@ export default function UnifiedSearchForm({
                   </Stack>
                 </Collapse>
               </Box>
-
-              {/* Botón de limpiar todo - solo aparece si hay contenido activo */}
-              {hasAnyActiveContent && (
-                <Fade in timeout={300}>
-                  <Box sx={{ pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Button 
-                      type="button" 
-                      variant="outlined" 
-                      size="large"
-                      onClick={handleClearAll}
-                      startIcon={<Clear />}
-                      fullWidth
-                      sx={{ 
-                        borderRadius: 2,
-                        borderColor: 'text.secondary',
-                        color: 'text.secondary',
-                        py: 1.5,
-                        fontWeight: 600,
-                        textTransform: 'none',
-                        '&:hover': {
-                          bgcolor: 'text.secondary',
-                          color: 'white',
-                          borderColor: 'text.secondary',
-                        }
-                      }}
-                    >
-                      Limpiar búsqueda y filtros
-                    </Button>
-                  </Box>
-                </Fade>
-              )}
             </Stack>
           </form>
         </Box>

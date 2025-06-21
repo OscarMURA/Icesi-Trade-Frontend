@@ -20,11 +20,15 @@ import {
   Typography,
   Fade,
   Paper,
+  Modal,
+  Backdrop,
+  IconButton,
 } from '@mui/material';
 import { 
   ChatBubbleOutline, 
   Send,
   VisibilityOutlined,
+  CloseRounded,
 } from '@mui/icons-material';
 import { useChat } from '../../contexts/ChatContext';
 import { addNotification } from '../../api/notificationApi';
@@ -152,46 +156,46 @@ export default function ProductCard({
   };
 
   return (
-    <Fade in timeout={300}>
-      <Card
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        sx={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          borderRadius: 3,
-          overflow: 'hidden',
-          background: 'linear-gradient(135deg, #f8f4ff 0%, #ffffff 100%)',
-          border: '1px solid',
-          borderColor: isHovered ? 'primary.main' : 'divider',
-          boxShadow: isHovered 
-            ? '0 12px 28px rgba(106, 27, 154, 0.15)' 
-            : '0 4px 12px rgba(0,0,0,0.08)',
-          transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          position: 'relative',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, #6a1b9a 0%, #3f51b5 100%)',
-            opacity: isHovered ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-          }
-        }}
-      >
-        <CardContent sx={{ 
-          flexGrow: 1, 
-          display: 'flex', 
-          flexDirection: 'column',
-          p: 0,
-          '&:last-child': { pb: 0 }
-        }}>
-          {!editing ? (
+    <>
+      <Fade in timeout={300}>
+        <Card
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            borderRadius: 3,
+            overflow: 'hidden',
+            background: 'linear-gradient(135deg, #f8f4ff 0%, #ffffff 100%)',
+            border: '1px solid',
+            borderColor: isHovered ? 'primary.main' : 'divider',
+            boxShadow: isHovered 
+              ? '0 12px 28px rgba(106, 27, 154, 0.15)' 
+              : '0 4px 12px rgba(0,0,0,0.08)',
+            transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            position: 'relative',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #6a1b9a 0%, #3f51b5 100%)',
+              opacity: isHovered ? 1 : 0,
+              transition: 'opacity 0.3s ease',
+            }
+          }}
+        >
+          <CardContent sx={{ 
+            flexGrow: 1, 
+            display: 'flex', 
+            flexDirection: 'column',
+            p: 0,
+            '&:last-child': { pb: 0 }
+          }}>
             <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
               <ProductInfo
                 product={product}
@@ -327,17 +331,105 @@ export default function ProductCard({
                 />
               )}
             </Box>
-          ) : (
-            <Box sx={{ p: 2.5 }}>
-              <ProductEditForm
-                product={product}
-                onCancel={handleCancel}
-                onUpdate={handleUpdate}
-              />
+          </CardContent>
+        </Card>
+      </Fade>
+
+
+      {/* Modal de edición - VERSIÓN CORREGIDA */}
+      <Modal
+        open={editing}
+        onClose={handleCancel}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 300,
+            sx: {
+              bgcolor: 'rgba(0, 0, 0, 0.7)',
+              backdropFilter: 'blur(8px)',
+            }
+          }
+        }}
+        sx={{
+          display: 'flex',
+          alignItems: { xs: 'flex-start', sm: 'center' }, // En móvil alinea arriba
+          justifyContent: 'center',
+          p: { xs: 1, sm: 2 }, // Menos padding en móvil
+          pt: { xs: 2, sm: 2 }, // Padding top específico para móvil
+        }}
+      >
+        <Fade in={editing} timeout={300}>
+          <Box
+            sx={{
+              width: '100%',
+              maxWidth: { xs: '100%', sm: 800 }, // Full width en móvil
+              height: { xs: '100vh', sm: 'auto' }, // Full height en móvil
+              maxHeight: { xs: '100vh', sm: '90vh' },
+              bgcolor: 'background.paper',
+              borderRadius: { xs: 0, sm: 4 }, // Sin border radius en móvil
+              boxShadow: '0 24px 64px rgba(0,0,0,0.3)',
+              overflow: 'hidden',
+              position: 'relative',
+              outline: 'none',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {/* Botón de cierre */}
+            <IconButton
+              onClick={handleCancel}
+              sx={{
+                position: 'absolute',
+                top: { xs: 8, sm: 16 },
+                right: { xs: 8, sm: 16 },
+                zIndex: 1000,
+                bgcolor: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                '&:hover': {
+                  bgcolor: 'rgba(244, 67, 54, 0.1)',
+                  color: '#f44336',
+                },
+              }}
+            >
+              <CloseRounded />
+            </IconButton>
+
+            {/* Contenido del modal con scroll */}
+            <Box 
+              sx={{ 
+                flex: 1,
+                overflow: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                // Estilos específicos para el scroll en móvil
+                '&::-webkit-scrollbar': {
+                  width: '6px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: '#f1f1f1',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#c1c1c1',
+                  borderRadius: '3px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  background: '#a8a8a8',
+                },
+              }}
+            >
+              <Box sx={{ p: { xs: 2, sm: 3 }, minHeight: '100%' }}>
+                <ProductEditForm
+                  product={product}
+                  onCancel={handleCancel}
+                  onUpdate={handleUpdate}
+                />
+              </Box>
             </Box>
-          )}
-        </CardContent>
-      </Card>
-    </Fade>
+          </Box>
+        </Fade>
+      </Modal>
+    </>
   );
 }
