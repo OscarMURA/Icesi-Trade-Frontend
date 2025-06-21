@@ -23,13 +23,21 @@ export const searchProducts = async (filters: ProductFilters): Promise<Product[]
   if (filters.location) params.append('location', filters.location);
   if (filters.search) params.append('search', filters.search);
 
-  const response = await axios.get(`/api/products?${params.toString()}`);
+  const token = getToken();
+  const headers: any = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await axios.get(`/api/products?${params.toString()}`, { headers });
   return response.data;
 };
 
 export const createProduct = async (product: Omit<ProductCreateDto, 'sellerId'>): Promise<any> => {
   const token = getToken();
-  console.log('Token obtenido:', token ? 'Token presente' : 'No hay token');
   
   const response = await axios.post('/api/products', product, {
     headers: {
@@ -60,7 +68,26 @@ export const markProductAsSold = async (productId: number): Promise<void> => {
 };
 
 export const getProducts = async (): Promise<Product[]> => {
-  const response = await axios.get('/api/products');
+  const token = getToken();
+  const headers: any = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await axios.get('/api/products', { headers });
+  return response.data;
+};
+
+export const getAvailableProducts = async (): Promise<Product[]> => {
+  const response = await axios.get('/api/products/available', {
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+      'Content-Type': 'application/json',
+    },
+  });
   return response.data;
 };
 
@@ -81,4 +108,4 @@ export const deleteProduct = async (productId: number): Promise<void> => {
       'Content-Type': 'application/json',
     },
   });
-}
+};

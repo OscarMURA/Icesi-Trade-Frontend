@@ -1,24 +1,20 @@
 import { useState, useEffect } from 'react';
-import { getProducts } from '../api/productApi';
+import { getAvailableProducts } from '../api/productApi';
 import ProductList from '../components/products/ProductList';
 import type { Product } from '../types/productTypes';
-import { Box, Typography, Skeleton, Grid } from '@mui/material';
-import { getIdFromToken } from '../api/userServices';
+import { Box, Typography, Skeleton, Alert } from '@mui/material';
+import useAuth from '../hooks/useAuth';
 
 export default function ProductsManager() {
+  const { isAuthenticated } = useAuth();
   const [listProducts, setListProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const products = await getProducts();
-        const currentUserId = getIdFromToken();
-
-        const filtered = products.filter(
-          (p) => p.sellerId !== currentUserId && !p.isSold
-        );
-        setListProducts(filtered);
+        const products = await getAvailableProducts();
+        setListProducts(products);
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -50,16 +46,25 @@ export default function ProductsManager() {
 
             </Box>
 
+      {isAuthenticated && (
+        <Alert 
+          severity="info" 
+          sx={{ mb: 3, borderRadius: 2 }}
+        >
+          Se muestran automáticamente solo los productos disponibles (no vendidos) y que no son tuyos.
+        </Alert>
+      )}
+
       {isLoading ? (
-        <Grid container spacing={3}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 3 }}>
           {[...Array(12)].map((_, i) => (
-            <Grid item xs={12} sm={6} md={4} key={i}>
+            <Box key={i}>
               <Skeleton variant="rectangular" height={250} sx={{ borderRadius: 2 }} />
               <Skeleton width="80%" sx={{ mt: 1 }} />
               <Skeleton width="60%" />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : (
         <ProductList products={listProducts} />
       )}
