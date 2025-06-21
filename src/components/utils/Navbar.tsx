@@ -90,12 +90,12 @@ export default function Navbar() {
 
       <Button
         component={Link}
-        to="/g1/losbandalos/Icesi-Trade/my-sales"
+        to="/g1/losbandalos/Icesi-Trade/my-products"
         variant="outlined"
         startIcon={<ShoppingBag size={18} />}
         sx={{ borderRadius: '999px' }}
       >
-        Mis ventas
+        Mis productos
       </Button>
 
       <Button
@@ -305,11 +305,11 @@ export default function Navbar() {
               </MenuItem>
               <MenuItem
                 component={Link}
-                to="/g1/losbandalos/Icesi-Trade/my-sales"
+                to="/g1/losbandalos/Icesi-Trade/my-products"
                 onClick={handleMenuClose}
               >
                 <ShoppingBag fontSize={16} style={{ marginRight: 8 }} />
-                Mis ventas
+                Mis productos
               </MenuItem>
               <MenuItem
                 component={Link}
