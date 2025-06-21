@@ -28,9 +28,12 @@ export const searchProducts = async (filters: ProductFilters): Promise<Product[]
 };
 
 export const createProduct = async (product: Omit<ProductCreateDto, 'sellerId'>): Promise<any> => {
+  const token = getToken();
+  console.log('Token obtenido:', token ? 'Token presente' : 'No hay token');
+  
   const response = await axios.post('/api/products', product, {
     headers: {
-      Authorization: `Bearer ${getToken()}`,
+      Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   });

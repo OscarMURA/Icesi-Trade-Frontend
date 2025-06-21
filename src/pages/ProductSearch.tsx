@@ -6,6 +6,8 @@ import QueryForm from '../components/queries/QueryForm';
 import FilterForm, { FilterOptions } from '../components/queries/FilterForm';
 import ProductList from '../components/products/ProductList';
 import { Product } from '../types/productTypes';
+import { Box, Typography } from '@mui/material';
+
 
 export default function ProductSearch() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -67,11 +69,24 @@ export default function ProductSearch() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-          Buscar productos
-        </h1>
-      </div>
+       {/* Header con información */}
+       <Box mb={4} textAlign="center">
+              <Typography 
+                variant="h4" 
+                gutterBottom
+                sx={{ 
+                  fontWeight: 700,
+                  background: 'linear-gradient(45deg, #6a1b9a, #9c27b0)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 1
+                }}
+              >
+                Buscar Productos Disponibles
+              </Typography>
+
+            </Box>
 
       <div className="max-w-2xl mx-auto flex flex-col gap-4 mb-8">
         <QueryForm onSearch={handleSearch} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
