@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { searchProducts, ProductFilters } from '../api/productApi';
 import { getCategories } from '../api/categoryApi';
@@ -5,7 +6,6 @@ import QueryForm from '../components/queries/QueryForm';
 import FilterForm, { FilterOptions } from '../components/queries/FilterForm';
 import ProductList from '../components/products/ProductList';
 import { Product } from '../types/productTypes';
-import { Search } from 'lucide-react';
 
 export default function ProductSearch() {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
@@ -76,12 +76,6 @@ export default function ProductSearch() {
       <div className="max-w-2xl mx-auto flex flex-col gap-4 mb-8">
         <QueryForm onSearch={handleSearch} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <FilterForm onFilter={handleFilter} categories={categories} />
-        <button
-          onClick={handleSearch}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-2xl w-full text-xl shadow-lg transition"
-        >
-          <Search size={22} /> Buscar
-        </button>
       </div>
 
       {isLoading ? (

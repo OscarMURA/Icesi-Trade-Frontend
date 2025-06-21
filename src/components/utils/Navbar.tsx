@@ -9,6 +9,13 @@ import {
   MenuItem,
   Toolbar,
   Typography,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Bell,
@@ -19,6 +26,7 @@ import {
   User,
   Search,
   PackagePlus,
+  Heart,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -28,8 +36,11 @@ import { getRolesFromToken } from '../../api/userServices';
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     handleMenuClose();
@@ -54,6 +65,137 @@ export default function Navbar() {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  const renderNavItems = () => (
+    <>
+      <Button
+        component={Link}
+        to="/g1/losbandalos/Icesi-Trade/search"
+        variant="outlined"
+        startIcon={<Search size={18} />}
+        sx={{ borderRadius: '999px' }}
+      >
+        Buscar
+      </Button>
+
+      <Button
+        component={Link}
+        to="/g1/losbandalos/Icesi-Trade/create-product"
+        variant="contained"
+        startIcon={<PackagePlus size={18} />}
+        sx={{ backgroundColor: '#1e40af', borderRadius: '999px' }}
+      >
+        Crear
+      </Button>
+
+      <Button
+        component={Link}
+        to="/g1/losbandalos/Icesi-Trade/my-sales"
+        variant="outlined"
+        startIcon={<ShoppingBag size={18} />}
+        sx={{ borderRadius: '999px' }}
+      >
+        Mis ventas
+      </Button>
+
+      <Button
+        component={Link}
+        to="/g1/losbandalos/Icesi-Trade/my-purchases"
+        variant="outlined"
+        startIcon={<ShoppingBag size={18} />}
+        sx={{ borderRadius: '999px' }}
+      >
+        Mis compras
+      </Button>
+
+      <Button
+        component={Link}
+        to="/g1/losbandalos/Icesi-Trade/my-favorites"
+        variant="outlined"
+        startIcon={<Heart size={18} />}
+        sx={{ borderRadius: '999px' }}
+      >
+        Favoritos
+      </Button>
+
+      {getRolesFromToken()?.includes('ROLE_ADMIN') && (
+        <Button
+          component={Link}
+          to="/g1/losbandalos/Icesi-Trade/admin-panel"
+          variant="contained"
+          sx={{
+            backgroundColor: '#f59e0b',
+            borderRadius: '999px',
+            fontWeight: 600,
+            color: 'white',
+            '&:hover': { backgroundColor: '#d97706' },
+          }}
+        >
+          Admin
+        </Button>
+      )}
+    </>
+  );
+
+  const renderMobileMenu = () => (
+    <Drawer
+      anchor="right"
+      open={mobileMenuOpen}
+      onClose={() => setMobileMenuOpen(false)}
+    >
+      <Box sx={{ width: 250, pt: 2 }}>
+        <List>
+          <ListItem>
+            <ListItemIcon>
+              <Search size={20} />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Link
+                  to="/g1/losbandalos/Icesi-Trade/search"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  Buscar
+                </Link>
+              }
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemIcon>
+              <PackagePlus size={20} />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Link
+                  to="/g1/losbandalos/Icesi-Trade/create-product"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
+                  Crear
+                </Link>
+              }
+            />
+          </ListItem>
+          {getRolesFromToken()?.includes('ROLE_ADMIN') && (
+            <ListItem>
+              <ListItemText
+                primary={
+                  <Link
+                    to="/g1/losbandalos/Icesi-Trade/admin-panel"
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{ textDecoration: 'none', color: '#f59e0b', fontWeight: 600 }}
+                  >
+                    Admin
+                  </Link>
+                }
+              />
+            </ListItem>
+          )}
+        </List>
+      </Box>
+    </Drawer>
+  );
 
   return (
     <AppBar position="sticky" sx={{ backgroundColor: '#fefefe', borderBottom: '1px solid #e0e0e0', boxShadow: 0 }}>
@@ -102,69 +244,10 @@ export default function Navbar() {
         {/* Usuario autenticado */}
         {user && (
           <Box display="flex" alignItems="center" gap={2}>
-            {/* Botón de búsqueda */}
-            <Button
-              component={Link}
-              to="/g1/losbandalos/Icesi-Trade/search"
-              variant="outlined"
-              startIcon={<Search size={18} />}
-              sx={{ borderRadius: '999px' }}
-            >
-              Buscar
-            </Button>
+            {/* Botones de navegación */}
+            {!isMobile && renderNavItems()}
 
-            {/* Botón de crear productos */}
-            <Button
-              component={Link}
-              to="/g1/losbandalos/Icesi-Trade/create-product"
-              variant="contained"
-              startIcon={<PackagePlus size={18} />}
-              sx={{ backgroundColor: '#1e40af', borderRadius: '999px' }}
-            >
-              Crear
-            </Button>
-
-            {/* Botón de mis ventas */}
-            <Button
-              component={Link}
-              to="/g1/losbandalos/Icesi-Trade/my-sales"
-              variant="outlined"
-              startIcon={<ShoppingBag size={18} />}
-              sx={{ borderRadius: '999px' }}
-            >
-              Mis ventas
-            </Button>
-
-            {/* Botón de mis compras */}
-            <Button
-              component={Link}
-              to="/g1/losbandalos/Icesi-Trade/my-purchases"
-              variant="outlined"
-              startIcon={<ShoppingBag size={18} />}
-              sx={{ borderRadius: '999px' }}
-            >
-              Mis compras
-            </Button>
-
-            {/* Botón Admin (solo si tiene ROLE_ADMIN) */}
-            {getRolesFromToken()?.includes('ROLE_ADMIN') && (
-              <Button
-                component={Link}
-                to="/g1/losbandalos/Icesi-Trade/admin-panel"
-                variant="contained"
-                sx={{
-                  backgroundColor: '#f59e0b',
-                  borderRadius: '999px',
-                  fontWeight: 600,
-                  color: 'white',
-                  '&:hover': { backgroundColor: '#d97706' },
-                }}
-              >
-                Admin
-              </Button>
-            )}
-
-            {/* Notificaciones */}
+            {/* Notificaciones y Chat siempre visibles */}
             <IconButton
               component={Link}
               to="/g1/losbandalos/Icesi-Trade/notifications"
@@ -180,16 +263,22 @@ export default function Navbar() {
               </Badge>
             </IconButton>
 
-            {/* Chat */}
             <IconButton component={Link} to="/g1/losbandalos/Icesi-Trade/chat">
               <MessageSquare className="text-gray-600" />
             </IconButton>
 
-            {/* Menú de usuario */}
+            {/* Avatar y menú de usuario */}
             <IconButton onClick={handleMenuOpen}>
-              <Avatar sx={{ bgcolor: '#cfe8fc', color: '#1e40af' }}>
-                {getInitials(user.name)}
-              </Avatar>
+              <Badge
+                color="error"
+                variant="dot"
+                overlap="circular"
+                sx={{ '& .MuiBadge-badge': { top: 4, right: 4 } }}
+              >
+                <Avatar sx={{ bgcolor: '#cfe8fc', color: '#1e40af' }}>
+                  {getInitials(user.name)}
+                </Avatar>
+              </Badge>
             </IconButton>
 
             <Menu
@@ -232,6 +321,14 @@ export default function Navbar() {
               </MenuItem>
               <MenuItem
                 component={Link}
+                to="/g1/losbandalos/Icesi-Trade/my-favorites"
+                onClick={handleMenuClose}
+              >
+                <Heart fontSize={16} style={{ marginRight: 8 }} />
+                Mis favoritos
+              </MenuItem>
+              <MenuItem
+                component={Link}
                 to="/g1/losbandalos/Icesi-Trade/search"
                 onClick={handleMenuClose}
               >
@@ -254,6 +351,7 @@ export default function Navbar() {
           </Box>
         )}
       </Toolbar>
+      {renderMobileMenu()}
     </AppBar>
   );
 }

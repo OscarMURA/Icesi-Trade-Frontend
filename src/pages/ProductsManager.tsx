@@ -31,18 +31,24 @@ export default function ProductsManager() {
 
   return (
     <Box maxWidth="lg" mx="auto" px={2} py={4}>
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        mb={4}
-        sx={{
-          background: 'linear-gradient(to right, #3b82f6, #1e40af)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-        }}
-      >
-        Productos disponibles
-      </Typography>
+            {/* Header con información */}
+            <Box mb={4} textAlign="center">
+        <Typography 
+          variant="h4" 
+          gutterBottom
+          sx={{ 
+            fontWeight: 700,
+            background: 'linear-gradient(45deg, #6a1b9a, #9c27b0)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            mb: 1
+          }}
+        >
+          Productos Disponibles
+        </Typography>
+
+      </Box>
 
       {isLoading ? (
         <Grid container spacing={3}>
