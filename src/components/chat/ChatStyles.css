@@ -1,0 +1,146 @@
+/* Estilos específicos para el chat responsive */
+
+/* Ocultar scrollbar en móvil para una experiencia más limpia */
+@media (max-width: 768px) {
+  .chat-mobile-container {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  .chat-mobile-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
+
+/* Animaciones suaves para transiciones */
+.chat-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Mejorar la experiencia táctil en móvil */
+@media (max-width: 768px) {
+  .chat-touch-target {
+    min-height: 48px; /* Tamaño mínimo recomendado para touch */
+    padding: 12px 16px;
+  }
+  
+  .chat-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Estilos para el input en móvil */
+@media (max-width: 768px) {
+  .chat-input-container {
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .chat-input-field {
+    border-radius: 20px;
+    background-color: white;
+  }
+}
+
+/* Mejorar la legibilidad de los mensajes en móvil */
+@media (max-width: 768px) {
+  .chat-message {
+    max-width: 85%;
+    margin-bottom: 8px;
+  }
+  
+  .chat-message-own {
+    margin-left: auto;
+  }
+  
+  .chat-message-other {
+    margin-right: auto;
+  }
+}
+
+/* Estilos para el header móvil */
+.chat-mobile-header {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Mejorar la lista de usuarios en móvil */
+@media (max-width: 768px) {
+  .chat-users-list {
+    background-color: white;
+  }
+  
+  .chat-user-item {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+  }
+  
+  .chat-user-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .chat-user-item:active {
+    background-color: #e3f2fd;
+  }
+}
+
+/* Estilos para el estado vacío en móvil */
+@media (max-width: 768px) {
+  .chat-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+  }
+}
+
+/* Mejorar el scroll automático en móvil */
+.chat-messages-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Estilos para el indicador de conexión */
+.chat-connection-status {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #4caf50;
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+.chat-connection-status.disconnected {
+  background-color: #f44336;
+}
+
+/* Mejorar la accesibilidad */
+.chat-focus-visible:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+/* Estilos para el modo oscuro (futuro) */
+@media (prefers-color-scheme: dark) {
+  .chat-dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+  }
+  
+  .chat-dark-mode .chat-message-own {
+    background-color: #1976d2;
+  }
+  
+  .chat-dark-mode .chat-message-other {
+    background-color: #424242;
+  }
+} 
