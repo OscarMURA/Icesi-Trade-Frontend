@@ -180,6 +180,11 @@ export default function MyPurchases() {
     handleClose(productId);
   };
 
+  // Eliminar productos duplicados por id
+  const uniquePurchasedProducts = Array.from(
+    new Map(purchasedProducts.map(p => [p.id, p])).values()
+  );
+
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header con gradiente */}
@@ -379,7 +384,7 @@ export default function MyPurchases() {
       {isLoading ? (
         <Grid container spacing={3}>
           {[...Array(8)].map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={`skeleton-${index}`}>
               <ProductSkeleton />
             </Grid>
           ))}
@@ -389,7 +394,7 @@ export default function MyPurchases() {
       ) : (
         <Fade in timeout={600}>
           <Grid container spacing={3}>
-            {purchasedProducts.map((product, index) => (
+            {uniquePurchasedProducts.map((product, index) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
                 <Fade in timeout={300 + index * 100}>
                   <Box>
