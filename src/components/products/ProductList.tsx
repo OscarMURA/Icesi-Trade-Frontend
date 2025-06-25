@@ -117,7 +117,8 @@ export default function ProductList({
               xs={12}
               sm={6}
               md={4}
-              lg={3}
+              lg={2}
+              xl={2}
               key={product.id}
             >
               <Fade in timeout={600 + (index * 100)}>
