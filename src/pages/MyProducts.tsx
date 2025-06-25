@@ -437,7 +437,7 @@ export default function MyProducts() {
           <EmptyState onRefresh={fetchProducts} isSold={false} />
         ) : (
           <Fade in timeout={600}>
-            <Grid container spacing={3}>
+            <Grid container spacing={3} sx={{ justifyContent: 'center', alignItems: 'stretch' }}>
               {filteredProducts.map((product, index) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
                   <Fade in timeout={300 + index * 100}>
@@ -457,7 +457,7 @@ export default function MyProducts() {
           <EmptyState onRefresh={fetchProducts} isSold={true} />
         ) : (
           <Fade in timeout={600}>
-            <Grid container spacing={3}>
+            <Grid container spacing={3} sx={{ justifyContent: 'center', alignItems: 'stretch' }}>
               {filteredProducts.map((product, index) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
                   <Fade in timeout={300 + index * 100}>

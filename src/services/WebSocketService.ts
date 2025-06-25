@@ -24,11 +24,8 @@ class WebSocketService {
   }
 
   connect(username: string, userId: number, onMessage: (message: any) => void) {
-    console.log('Iniciando conexión WebSocket...');
-    
     // Si ya hay una conexión activa, desconectarla primero
     if (this.stompClient?.connected) {
-      console.log('Desconectando conexión existente...');
       this.disconnect();
     }
 
@@ -53,12 +50,10 @@ class WebSocketService {
     }
 
     if (this.isConnecting) {
-      console.log('Ya hay una conexión en progreso');
       return;
     }
 
     this.isConnecting = true;
-    console.log('Inicializando cliente STOMP...');
 
     const wsUrl = `${this.WS_URL}/g1/losbandalos/ws`;
 
@@ -69,7 +64,10 @@ class WebSocketService {
         userId: this.userId.toString()
       },
       debug: (str) => {
-        console.log('STOMP Debug:', str);
+        // Solo mostrar logs de debug en desarrollo
+        if (import.meta.env.DEV) {
+          console.log('STOMP Debug:', str);
+        }
       },
       reconnectDelay: this.reconnectDelay,
       heartbeatIncoming: 0,
@@ -78,7 +76,7 @@ class WebSocketService {
         return new window.WebSocket(wsUrl);
       },
       onConnect: () => {
-        console.log('Conectado al WebSocket exitosamente');
+        console.log('WebSocket conectado exitosamente');
         this.isConnecting = false;
         this.reconnectAttempts = 0;
         this.subscribeToTopics();
@@ -89,7 +87,6 @@ class WebSocketService {
         
         // Si el error es "Session closed", intentar reconectar inmediatamente
         if (frame.headers.message === 'Session closed.') {
-          console.log('Sesión cerrada, intentando reconectar...');
           this.reconnectAttempts = 0;
           this.handleReconnect();
         } else {
@@ -109,7 +106,6 @@ class WebSocketService {
     });
 
     try {
-      console.log('Activando cliente STOMP...');
       this.stompClient.activate();
     } catch (error) {
       console.error('Error al activar el cliente STOMP:', error);
@@ -121,7 +117,7 @@ class WebSocketService {
   private handleReconnect() {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
-      console.log(`Intentando reconectar (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+      console.log(`Reconectando... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
       
       // Limpiar cualquier intento de reconexión pendiente
       if (this.reconnectTimeout) {
@@ -154,26 +150,20 @@ class WebSocketService {
     }
 
     try {
-      console.log('Suscribiéndose a tópicos...');
-      
       // Suscribirse al tópico privado del usuario
       if (this.username) {
         this.stompClient.subscribe(`/user/${this.username}/queue/messages`, (message) => {
-          console.log('Mensaje privado recibido:', message);
           if (this.messageCallback) {
             this.messageCallback(message);
           }
         });
       }
-      console.log('Suscripciones completadas');
     } catch (error) {
       console.error('Error al suscribirse a los tópicos:', error);
     }
   }
 
   disconnect() {
-    console.log('Desconectando WebSocket...');
-    
     // Limpiar el timeout de reconexión
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
@@ -197,7 +187,6 @@ class WebSocketService {
   }
 
   sendMessage(senderId: number, receiverId: number, message: string) {
-    console.log('Intentando enviar mensaje...');
     if (!this.stompClient?.connected) {
       console.error('WebSocket no está conectado');
       this.connect(this.username || '', this.userId || 0, this.messageCallback || (() => {}));
@@ -212,12 +201,10 @@ class WebSocketService {
     };
 
     try {
-      console.log('Enviando mensaje privado:', messageObj);
       this.stompClient.publish({
         destination: '/app/chat.private',
         body: JSON.stringify(messageObj)
       });
-      console.log('Mensaje enviado exitosamente');
     } catch (error) {
       console.error('Error al enviar mensaje:', error);
       throw error;

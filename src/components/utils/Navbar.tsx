@@ -23,6 +23,7 @@ import {
   Flower2,
   LogOut,
   MessageSquare,
+  ShoppingCart,
   ShoppingBag,
   User,
   Search,
@@ -176,7 +177,7 @@ export default function Navbar() {
           component={Link}
           to="/g1/losbandalos/Icesi-Trade/my-purchases"
           variant="outlined"
-          startIcon={<ShoppingBag size={18} />}
+          startIcon={<ShoppingCart size={18} />}
           sx={{
             ...navButtonStyles,
             borderColor: '#4caf50',
@@ -571,7 +572,7 @@ export default function Navbar() {
               {[
                 { icon: User, text: 'Perfil', path: '/profile' },
                 { icon: ShoppingBag, text: 'Mis productos', path: '/my-products' },
-                { icon: ShoppingBag, text: 'Mis compras', path: '/my-purchases' },
+                { icon: ShoppingCart, text: 'Mis compras', path: '/my-purchases' },
                 { icon: Heart, text: 'Mis favoritos', path: '/my-favorites' },
                 { icon: Search, text: 'Buscar', path: '/search' },
                 { icon: PackagePlus, text: 'Crear', path: '/create-product' },

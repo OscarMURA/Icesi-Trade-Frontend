@@ -97,13 +97,15 @@ export default function ProductList({
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
  
       {/* Grid de productos con altura uniforme */}
       <Fade in timeout={800}>
         <Grid
           container
           spacing={3}
+          justifyContent="center"
+          alignItems="stretch"
           sx={{
             '& .MuiGrid-item': {
               display: 'flex',
@@ -117,16 +119,16 @@ export default function ProductList({
               xs={12}
               sm={6}
               md={4}
-              lg={2}
-              xl={2}
+              lg={3}
+              xl={3}
               key={product.id}
             >
               <Fade in timeout={600 + (index * 100)}>
                 <Box 
                   sx={{ 
                     height: '100%',
-                    minHeight: 500, // Altura mínima uniforme
-                    maxHeight: 600, // Altura máxima para evitar tarjetas muy altas
+                    minHeight: 500,
+                    maxHeight: 600,
                     display: 'flex',
                     flexDirection: 'column'
                   }}
