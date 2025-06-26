@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Product } from '../../types/productTypes';
 import {
   Button,
@@ -29,7 +29,7 @@ import {
   ImageRounded,
   DeleteRounded,
 } from '@mui/icons-material';
-import { uploadImage } from '../../api/uploadImage';
+import { uploadMultipleImages } from '../../api/uploadImage';
 
 export default function ProductEditForm({
   product,
@@ -48,8 +48,15 @@ export default function ProductEditForm({
     imageUrl: product.imageUrl || '',
   });
 
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>(product.imageUrl || '');
+  const [images, setImages] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [existingUrls, setExistingUrls] = useState<string[]>(product.imageUrl ? product.imageUrl.split(',') : []);
+
+  useEffect(() => {
+    setPreviews(product.imageUrl ? product.imageUrl.split(',') : []);
+    setExistingUrls(product.imageUrl ? product.imageUrl.split(',') : []);
+  }, [product.imageUrl]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -59,32 +66,38 @@ export default function ProductEditForm({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const selected = e.target.files[0];
-      setImage(selected);
-      setPreview(URL.createObjectURL(selected));
+      const selectedFiles = Array.from(e.target.files);
+      if (selectedFiles.length + previews.length > 3) {
+        setError('Máximo 3 imágenes permitidas.');
+        return;
+      }
+      setImages([...images, ...selectedFiles]);
+      setPreviews([...previews, ...selectedFiles.map(file => URL.createObjectURL(file))]);
     }
   };
 
-  const handleRemoveImage = () => {
-    setImage(null);
-    setPreview('');
-    setForm({ ...form, imageUrl: '' });
+  const handleRemoveSingleImage = (index: number) => {
+    if (index < existingUrls.length) {
+      const newExisting = existingUrls.filter((_, i) => i !== index);
+      setExistingUrls(newExisting);
+      setPreviews(previews.filter((_, i) => i !== index));
+    } else {
+      const newIndex = index - existingUrls.length;
+      setImages(images.filter((_, i) => i !== newIndex));
+      setPreviews(previews.filter((_, i) => i !== index));
+    }
   };
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
       setError('');
-      let imageUrl = form.imageUrl;
-
-      if (image) {
-        imageUrl = await uploadImage(image);
-      } else if (!preview) {
-        imageUrl = '';
-      } else {
-        imageUrl = product.imageUrl || '';
+      let imageUrl = '';
+      let uploadedUrls: string[] = [];
+      if (images.length > 0) {
+        uploadedUrls = await uploadMultipleImages(images);
       }
-
+      imageUrl = [...existingUrls, ...uploadedUrls].join(',');
       const updatedProduct = { ...product, ...form, imageUrl };
       onUpdate(updatedProduct);
     } catch (err) {
@@ -135,13 +148,13 @@ export default function ProductEditForm({
               </Typography>
               
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                {preview && (
-                  <Box sx={{ position: 'relative' }}>
+                {previews.map((preview, index) => (
+                  <Box key={index} sx={{ position: 'relative' }}>
                     <img
                       src={preview}
-                      alt="Vista previa"
-                      style={{ 
-                        width: '120px', 
+                      alt={`Vista previa ${index + 1}`}
+                      style={{
+                        width: '120px',
                         height: '120px',
                         objectFit: 'cover',
                         borderRadius: 12,
@@ -150,7 +163,7 @@ export default function ProductEditForm({
                     />
                     <IconButton
                       size="small"
-                      onClick={handleRemoveImage}
+                      onClick={() => handleRemoveSingleImage(index)}
                       sx={{
                         position: 'absolute',
                         top: -8,
@@ -164,47 +177,49 @@ export default function ProductEditForm({
                       <DeleteRounded fontSize="small" />
                     </IconButton>
                   </Box>
-                )}
-                
+                ))}
                 <Button
                   variant="outlined"
                   component="label"
                   startIcon={<PhotoCameraRounded />}
-                  sx={{ 
+                  disabled={previews.length >= 3}
+                  sx={{
                     borderRadius: 2,
                     borderStyle: 'dashed',
                     py: 1.5,
                     px: 3,
-                    minHeight: preview ? 'auto' : '120px',
+                    minHeight: previews.length ? 'auto' : '120px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 1
                   }}
                 >
-                  {preview ? 'Cambiar imagen' : 'Subir imagen'}
+                  {previews.length ? 'Agregar más imágenes' : 'Subir imágenes'}
                   <input
                     type="file"
                     accept="image/*"
+                    multiple
                     onChange={handleImageChange}
                     hidden
+                    disabled={previews.length >= 3}
                   />
-                  {!preview && (
+                  {previews.length < 1 && (
                     <Typography variant="caption" color="text.secondary">
-                      JPG, PNG máx. 5MB
+                      JPG, PNG máx. 1MB cada una (máx. 3 imágenes)
                     </Typography>
                   )}
                 </Button>
               </Box>
 
-              {product.imageUrl && !image && !preview && (
+              {product.imageUrl && !images.length && !previews.length && (
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                   Imagen actual: 
                   <Button 
                     size="small" 
-                    onClick={() => setPreview(product.imageUrl || '')}
+                    onClick={() => setPreviews(product.imageUrl ? product.imageUrl.split(',') : [])}
                     sx={{ ml: 1 }}
                   >
-                    Ver imagen actual
+                    Ver imágenes actuales
                   </Button>
                 </Typography>
               )}
