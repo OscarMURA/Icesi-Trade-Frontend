@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getCategories } from "../api/categoryApi";
 import { Category } from "../types/categoryTypes";
 import { createProduct } from "../api/productApi";
-import { uploadImage } from "../api/uploadImage";
+import {  uploadMultipleImages } from "../api/uploadImage";
 import { ProductCreateDto } from "../types/productTypes";
 import { useNavigate } from "react-router-dom";
 
@@ -24,7 +24,9 @@ import {
   IconButton,
   Avatar,
   Alert,
-  Chip
+  Chip,
+  Collapse,
+  Link
 } from '@mui/material';
 
 import {
@@ -39,7 +41,9 @@ import {
   DeleteRounded,
   PublishRounded,
   ImageRounded,
-  CheckCircleRounded
+  CheckCircleRounded,
+  InfoRounded,
+  ExpandLessRounded
 } from '@mui/icons-material';
 
 // Función para obtener el color del estado
@@ -68,11 +72,12 @@ export default function CreateProduct() {
     categoryId: 0,
     imageUrl: "" 
   });
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>('');
+  const [images, setImages] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [showImageHelp, setShowImageHelp] = useState(false);
 
   useEffect(() => {
     getCategories()
@@ -82,16 +87,46 @@ export default function CreateProduct() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const selected = e.target.files[0];
-      setImage(selected);
-      setPreview(URL.createObjectURL(selected));
+      const selectedFiles = Array.from(e.target.files);
+      
+      // Verificar límite de 3 imágenes
+      if (selectedFiles.length > 3) {
+        setError("Máximo 3 imágenes permitidas.");
+        return;
+      }
+      
+      // Verificar tamaño de cada archivo (1MB = 1 * 1024 * 1024 bytes)
+      const maxSize = 1 * 1024 * 1024; // 1MB
+      for (const file of selectedFiles) {
+        if (file.size > maxSize) {
+          setError(`El archivo "${file.name}" es demasiado grande. Máximo 1MB permitido por imagen.`);
+          setShowImageHelp(true);
+          return;
+        }
+      }
+      
+      setImages(selectedFiles);
+      setPreviews(selectedFiles.map(file => URL.createObjectURL(file)));
+      setError(''); // Limpiar errores previos
+      setShowImageHelp(false); // Ocultar ayuda
     }
   };
 
-  const handleRemoveImage = () => {
-    setImage(null);
-    setPreview('');
-    setForm({ ...form, imageUrl: '' });
+
+
+  const handleRemoveSingleImage = (index: number) => {
+    const newImages = images.filter((_, i) => i !== index);
+    const newPreviews = previews.filter((_, i) => i !== index);
+    setImages(newImages);
+    setPreviews(newPreviews);
+    
+    // Actualizar imageUrl si hay imágenes restantes
+    if (newImages.length > 0) {
+      const urls = newImages.map(img => URL.createObjectURL(img));
+      setForm({ ...form, imageUrl: urls.join(',') });
+    } else {
+      setForm({ ...form, imageUrl: '' });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,9 +137,10 @@ export default function CreateProduct() {
     try {
       const finalForm = { ...form };
       
-      if (image) {
-        const url = await uploadImage(image);
-        finalForm.imageUrl = url;
+      if (images.length > 0) {
+        // Subir múltiples imágenes de una vez
+        const urls = await uploadMultipleImages(images);
+        finalForm.imageUrl = urls.join(',');
       }
 
       const data = await createProduct(finalForm);
@@ -124,7 +160,7 @@ export default function CreateProduct() {
     }
   };
 
-  const statusColors = getStatusColor(form.status);
+  const statusColors = getStatusColor(form.status || 'Nuevo');
 
   return (
     <Container maxWidth="md" sx={{ py: { xs: 2, sm: 4 } }}>
@@ -200,6 +236,84 @@ export default function CreateProduct() {
             </Alert>
           )}
 
+          {/* Ayuda de alivianadores de imágenes */}
+          <Collapse in={showImageHelp}>
+            <Paper 
+              elevation={0}
+              sx={{ 
+                mb: 3, 
+                p: 3, 
+                borderRadius: 2, 
+                bgcolor: 'rgba(25, 118, 210, 0.08)',
+                border: '1px solid',
+                borderColor: 'primary.light'
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <InfoRounded color="primary" />
+                <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
+                  ¿Necesitas reducir el tamaño de tu imagen?
+                </Typography>
+              </Box>
+              
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Puedes usar estos alivianadores de imágenes gratuitos para reducir el tamaño sin perder calidad. 
+                Recuerda que puedes subir hasta 3 imágenes de máximo 1MB cada una:
+              </Typography>
+              
+              <Stack spacing={1}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip size="small" label="Online" color="primary" variant="outlined" />
+                  <Link href="https://tinypng.com" target="_blank" rel="noopener" sx={{ fontWeight: 500 }}>
+                    TinyPNG
+                  </Link>
+                  <Typography variant="caption" color="text.secondary">
+                    - Compresión inteligente para PNG y JPEG
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip size="small" label="Online" color="primary" variant="outlined" />
+                  <Link href="https://compressor.io" target="_blank" rel="noopener" sx={{ fontWeight: 500 }}>
+                    Compressor.io
+                  </Link>
+                  <Typography variant="caption" color="text.secondary">
+                    - Compresión avanzada con control de calidad
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip size="small" label="Online" color="primary" variant="outlined" />
+                  <Link href="https://squoosh.app" target="_blank" rel="noopener" sx={{ fontWeight: 500 }}>
+                    Squoosh.app
+                  </Link>
+                  <Typography variant="caption" color="text.secondary">
+                    - Herramienta de Google con comparación en tiempo real
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Chip size="small" label="App" color="secondary" variant="outlined" />
+                  <Link href="https://imageoptim.com" target="_blank" rel="noopener" sx={{ fontWeight: 500 }}>
+                    ImageOptim
+                  </Link>
+                  <Typography variant="caption" color="text.secondary">
+                    - Aplicación de escritorio (Mac/Windows)
+                  </Typography>
+                </Box>
+              </Stack>
+              
+              <Button
+                size="small"
+                onClick={() => setShowImageHelp(false)}
+                sx={{ mt: 2 }}
+                startIcon={<ExpandLessRounded />}
+              >
+                Ocultar ayuda
+              </Button>
+            </Paper>
+          </Collapse>
+
           {/* Formulario */}
           <form onSubmit={handleSubmit}>
             <Stack spacing={3}>
@@ -236,11 +350,11 @@ export default function CreateProduct() {
                   flexWrap: 'wrap',
                   justifyContent: { xs: 'center', sm: 'flex-start' }
                 }}>
-                  {preview && (
-                    <Box sx={{ position: 'relative' }}>
+                  {previews.map((preview, index) => (
+                    <Box key={index} sx={{ position: 'relative' }}>
                       <img
                         src={preview}
-                        alt="Vista previa"
+                        alt={`Vista previa ${index + 1}`}
                         style={{ 
                           width: '150px', 
                           height: '150px',
@@ -252,7 +366,7 @@ export default function CreateProduct() {
                       />
                       <IconButton
                         size="small"
-                        onClick={handleRemoveImage}
+                        onClick={() => handleRemoveSingleImage(index)}
                         sx={{
                           position: 'absolute',
                           top: -8,
@@ -266,7 +380,7 @@ export default function CreateProduct() {
                         <DeleteRounded fontSize="small" />
                       </IconButton>
                     </Box>
-                  )}
+                  ))}
                   
                   <Button
                     variant="outlined"
@@ -277,7 +391,7 @@ export default function CreateProduct() {
                       borderStyle: 'dashed',
                       py: 2,
                       px: 3,
-                      minHeight: preview ? 'auto' : '150px',
+                      minHeight: previews.length > 0 ? 'auto' : '150px',
                       minWidth: { xs: '100%', sm: '200px' },
                       display: 'flex',
                       flexDirection: 'column',
@@ -290,16 +404,17 @@ export default function CreateProduct() {
                       }
                     }}
                   >
-                    {preview ? 'Cambiar imagen' : 'Subir imagen'}
+                    {previews.length > 0 ? 'Cambiar imágenes' : 'Subir imágenes'}
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
                       hidden
+                      multiple
                     />
-                    {!preview && (
+                    {!previews.length && (
                       <Typography variant="caption" color="text.secondary">
-                        JPG, PNG máx. 5MB
+                        JPG, PNG máx. 1MB cada una (máx. 3 imágenes)
                       </Typography>
                     )}
                   </Button>

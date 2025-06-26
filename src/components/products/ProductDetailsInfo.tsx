@@ -45,7 +45,6 @@ export default function ProductDetailsInfo({
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [sellerName, setSellerName] = useState<string>('');
-  const [ setBuyerNames] = useState<{ [key: number]: string }>({});
 
   const isOwner = user && product.sellerId === getIdFromToken();
 
@@ -134,26 +133,6 @@ export default function ProductDetailsInfo({
         return status;
     }
   };
-
-  useEffect(() => {
-    const fetchBuyerNames = async () => {
-      const names: { [key: number]: string } = {};
-      await Promise.all(
-        product.offers.map(async (offer) => {
-          if (!names[offer.buyer]) {
-            try {
-              const user = await getUserById(offer.buyer);
-              names[offer.buyer] = user.name;
-            } catch {
-              names[offer.buyer] = `#${offer.buyer}`;
-            }
-          }
-        })
-      );
-      setBuyerNames(names);
-    };
-    if (product.offers.length > 0) fetchBuyerNames();
-  }, [product.offers]);
 
   return (
     <Fade in timeout={600}>

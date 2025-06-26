@@ -78,7 +78,7 @@ export default function ProductInfo({
         >
           <CardMedia
             component="img"
-            image={product.imageUrl || defaultImage}
+            image={(product.imageUrl?.split(',')[0]) || defaultImage}
             alt={product.title}
             sx={{ 
               height: 200, // Tamaño fijo predeterminado

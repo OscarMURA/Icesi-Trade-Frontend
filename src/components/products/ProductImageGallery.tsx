@@ -31,6 +31,8 @@ export default function ProductImageGallery({
   status,
   price,
 }: ProductImageGalleryProps) {
+  const images = imageUrl ? imageUrl.split(',') : [];
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -39,11 +41,12 @@ export default function ProductImageGallery({
   const handleResetZoom = () => setZoom(1);
   const toggleFullscreen = () => setIsFullscreen(prev => !prev);
 
-  const defaultImage = 'https://via.placeholder.com/600x400?text=Sin+Imagen';
+  const defaultImage = 'https://content.elmueble.com/medio/2023/09/07/conejo-de-angora_9e4c6512_230907103329_1000x662.jpg';
+  const currentImage = images[selectedIndex] || defaultImage;
 
   return (
     <>
-      {/* Vista previa de la imagen */}
+      {/* Vista previa de la imagen principal */}
       <Box
         sx={{
           position: 'relative',
@@ -58,7 +61,7 @@ export default function ProductImageGallery({
       >
         <Box
           component="img"
-          src={imageUrl || defaultImage}
+          src={currentImage}
           alt={title}
           sx={{
             width: '100%',
@@ -94,7 +97,7 @@ export default function ProductImageGallery({
             />
             <IconButton
               sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.2)' }}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 setIsModalOpen(true);
               }}
@@ -113,6 +116,31 @@ export default function ProductImageGallery({
           </Box>
         </Box>
       </Box>
+
+      {/* Miniaturas */}
+      {images.length > 1 && (
+        <Stack direction="row" spacing={2} sx={{ mt: 2, justifyContent: 'center' }}>
+          {images.map((img, idx) => (
+            <Box
+              key={idx}
+              component="img"
+              src={img}
+              alt={`Miniatura ${idx + 1}`}
+              onClick={() => setSelectedIndex(idx)}
+              sx={{
+                width: 80,
+                height: 80,
+                objectFit: 'cover',
+                borderRadius: 2,
+                border: idx === selectedIndex ? '2px solid #6a1b9a' : '2px solid #e0e0e0',
+                cursor: 'pointer',
+                boxShadow: idx === selectedIndex ? 4 : 1,
+                transition: 'border 0.2s, box-shadow 0.2s',
+              }}
+            />
+          ))}
+        </Stack>
+      )}
 
       {/* Modal para vista completa */}
       <Modal
@@ -215,7 +243,7 @@ export default function ProductImageGallery({
             >
               <Box
                 component="img"
-                src={imageUrl || defaultImage}
+                src={currentImage}
                 alt={title}
                 sx={{
                   maxWidth: isFullscreen ? '100vw' : '90vw',
@@ -227,6 +255,31 @@ export default function ProductImageGallery({
                 }}
               />
             </Box>
+
+            {/* Miniaturas en el modal */}
+            {images.length > 1 && (
+              <Stack direction="row" spacing={2} sx={{ mt: 2, mb: 2, justifyContent: 'center' }}>
+                {images.map((img, idx) => (
+                  <Box
+                    key={idx}
+                    component="img"
+                    src={img}
+                    alt={`Miniatura modal ${idx + 1}`}
+                    onClick={() => setSelectedIndex(idx)}
+                    sx={{
+                      width: 60,
+                      height: 60,
+                      objectFit: 'cover',
+                      borderRadius: 2,
+                      border: idx === selectedIndex ? '2px solid #6a1b9a' : '2px solid #e0e0e0',
+                      cursor: 'pointer',
+                      boxShadow: idx === selectedIndex ? 4 : 1,
+                      transition: 'border 0.2s, box-shadow 0.2s',
+                    }}
+                  />
+                ))}
+              </Stack>
+            )}
 
             {/* Footer con información */}
             <Box
