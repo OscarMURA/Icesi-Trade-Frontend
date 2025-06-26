@@ -1,6 +1,7 @@
 export type Sale = {
   id: number; 
-  buyer: number;
+  buyer: number | { id: number };
+  buyerId: number;
   product: number;
   price: number;
   status?: 'pending' | 'completed' | 'cancelled'; 

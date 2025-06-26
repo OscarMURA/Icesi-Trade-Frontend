@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Sale } from '../../types/saleTypes';
 import axios from '../../api/axiosConfig';
-import { getToken } from '../../api/userServices';
+import { getToken, getUserById } from '../../api/userServices';
 import {
   Dialog,
   DialogTitle,
@@ -39,10 +39,32 @@ export default function ProductOffers({ productId, onClose }: ProductOffersProps
   const [offers, setOffers] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [buyerNames, setBuyerNames] = useState<{ [key: number]: string }>({});
 
   useEffect(() => {
     fetchOffers();
   }, [productId]);
+
+  useEffect(() => {
+    const fetchBuyerNames = async () => {
+      const names: { [key: number]: string } = {};
+      await Promise.all(
+        offers.map(async (offer) => {
+          const buyerId = offer.buyerId;
+          if (buyerId && !names[buyerId]) {
+            try {
+              const user = await getUserById(buyerId);
+              names[buyerId] = user?.name || `#${buyerId}`;
+            } catch {
+              names[buyerId] = `#${buyerId}`;
+            }
+          }
+        })
+      );
+      setBuyerNames(names);
+    };
+    if (offers.length > 0) fetchBuyerNames();
+  }, [offers]);
 
   const fetchOffers = async () => {
     try {
@@ -205,7 +227,7 @@ export default function ProductOffers({ productId, onClose }: ProductOffersProps
                           <PersonIcon />
                         </Avatar>
                         <Typography variant="subtitle1" fontWeight="600">
-                          Comprador #{offer.buyer}
+                          {`Comprador: ${buyerNames[offer.buyerId] ?? 'Desconocido'}`}
                         </Typography>
                       </Box>
                       
