@@ -34,6 +34,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { getRolesFromToken } from '../../api/userServices';
+import IcesiTradeLogo from '../ui/IcesiTradeLogo';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -372,7 +373,7 @@ export default function Navbar() {
                 },
               }}
             >
-              <Flower2 size={24} color="white" />
+              <IcesiTradeLogo style={{ width: 40, height: 40 }} />
             </Box>
             <Typography
               variant="h5"
