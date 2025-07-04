@@ -19,7 +19,7 @@ import AdminUserPanel from '../pages/AdminUserPanel';
 
 const router = createBrowserRouter([
   { 
-    path: '/g1/losbandalos/Icesi-Trade', 
+    path: '/', 
     element: <Layout />, 
     children: [
       {

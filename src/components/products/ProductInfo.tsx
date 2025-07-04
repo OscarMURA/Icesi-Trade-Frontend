@@ -59,7 +59,7 @@ export default function ProductInfo({
   const statusColors = getStatusColor(product.status);
 
   const handleImageClick = () => {
-    navigate(`/g1/losbandalos/Icesi-Trade/products/${product.id}`);
+    navigate(`/products/${product.id}`);
   };
 
   return (

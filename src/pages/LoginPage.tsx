@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ROUTES } from '../constants/routes';
 
 const LoginPage = () => {
   const navigate = useNavigate();

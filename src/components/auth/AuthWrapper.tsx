@@ -10,7 +10,7 @@ type Props = {
 
 export default function AuthWrapper({
   authorities = [],
-  redirect = '/g1/losbandalos/Icesi-Trade/login',
+  redirect = '/login',
 }: Props) {
   const { user, isAuthenticated } = useContext(AuthContext);
   const [isAuthorized, setIsAuthorized] = useState(false);

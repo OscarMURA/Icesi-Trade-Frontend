@@ -15,7 +15,6 @@ import {
   ListItemIcon,
   ListItemText,
   useMediaQuery,
-  useTheme,
   Fade,
 } from '@mui/material';
 import {
@@ -39,8 +38,7 @@ import IcesiTradeLogo from '../ui/IcesiTradeLogo';
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery('(max-width:1030px)');
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -48,7 +46,7 @@ export default function Navbar() {
   const handleLogout = () => {
     handleMenuClose();
     logout();
-    navigate('/g1/losbandalos/Icesi-Trade/login');
+    navigate('/login');
   };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -128,7 +126,7 @@ export default function Navbar() {
       <Box display="flex" alignItems="center" gap={1.5}>
         <Button
           component={Link}
-          to="/g1/losbandalos/Icesi-Trade/search"
+          to="/search"
           variant="outlined"
           startIcon={<Search size={18} />}
           sx={{
@@ -147,7 +145,7 @@ export default function Navbar() {
 
         <Button
           component={Link}
-          to="/g1/losbandalos/Icesi-Trade/create-product"
+          to="/create-product"
           variant="contained"
           startIcon={<PackagePlus size={18} />}
           sx={gradientButtonStyles}
@@ -157,7 +155,7 @@ export default function Navbar() {
 
         <Button
           component={Link}
-          to="/g1/losbandalos/Icesi-Trade/my-products"
+          to="/my-products"
           variant="outlined"
           startIcon={<ShoppingBag size={18} />}
           sx={{
@@ -176,7 +174,7 @@ export default function Navbar() {
 
         <Button
           component={Link}
-          to="/g1/losbandalos/Icesi-Trade/my-purchases"
+          to="/my-purchases"
           variant="outlined"
           startIcon={<ShoppingCart size={18} />}
           sx={{
@@ -195,7 +193,7 @@ export default function Navbar() {
 
         <Button
           component={Link}
-          to="/g1/losbandalos/Icesi-Trade/my-favorites"
+          to="/my-favorites"
           variant="outlined"
           startIcon={<Heart size={18} />}
           sx={{
@@ -215,7 +213,7 @@ export default function Navbar() {
         {getRolesFromToken()?.includes('ROLE_ADMIN') && (
           <Button
             component={Link}
-            to="/g1/losbandalos/Icesi-Trade/admin-panel"
+            to="/admin-panel"
             variant="contained"
             sx={adminButtonStyles}
           >
@@ -287,7 +285,7 @@ export default function Navbar() {
               <ListItemText
                 primary={
                   <Link
-                    to={`/g1/losbandalos/Icesi-Trade${item.path}`}
+                    to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
                       textDecoration: 'none',
@@ -317,7 +315,7 @@ export default function Navbar() {
               <ListItemText
                 primary={
                   <Link
-                    to="/g1/losbandalos/Icesi-Trade/admin-panel"
+                    to="/admin-panel"
                     onClick={() => setMobileMenuOpen(false)}
                     style={{
                       textDecoration: 'none',
@@ -360,6 +358,9 @@ export default function Navbar() {
         <Fade in timeout={300}>
           <Box display="flex" alignItems="center" gap={1.5}>
             <Box
+              component={Link}
+              to="/"
+              onClick={()   => setMobileMenuOpen(false)}
               sx={{
                 p: 1,
                 borderRadius: '16px',
@@ -375,25 +376,25 @@ export default function Navbar() {
             >
               <IcesiTradeLogo style={{ width: 40, height: 40 }} />
             </Box>
-            <Typography
-              variant="h5"
-              component={Link}
-              to="/g1/losbandalos/Icesi-Trade"
-              sx={{
-                textDecoration: 'none',
-                background: 'linear-gradient(135deg, #6a1b9a 0%, #3f51b5 100%)',
-                WebkitBackgroundClip: 'text',
-                color: 'transparent',
-                fontWeight: 800,
-                letterSpacing: '-0.02em',
-                transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                },
-              }}
-            >
-              Icesi Trade
-            </Typography>
+                          <Typography
+                variant="h5"
+                component={Link}
+                to="/"
+                sx={{
+                  textDecoration: 'none',
+                  background: 'linear-gradient(135deg, #6a1b9a 0%, #3f51b5 100%)',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em',
+                  transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+                  '&:hover': {
+                    transform: 'scale(1.02)',
+                  },
+                }}
+              >
+                Icesi Trade
+              </Typography>
           </Box>
         </Fade>
 
@@ -403,7 +404,7 @@ export default function Navbar() {
             <Box display="flex" gap={1.5}>
               <Button
                 component={Link}
-                to="/g1/losbandalos/Icesi-Trade/login"
+                to="/login"
                 variant="outlined"
                 sx={{
                   ...navButtonStyles,
@@ -416,11 +417,11 @@ export default function Navbar() {
                   },
                 }}
               >
-                Iniciar sesión
+                Iniciar
               </Button>
               <Button
                 component={Link}
-                to="/g1/losbandalos/Icesi-Trade/register"
+                to="/register"
                 variant="contained"
                 sx={gradientButtonStyles}
               >
@@ -440,7 +441,7 @@ export default function Navbar() {
             <Box display="flex" gap={1}>
               <IconButton
                 component={Link}
-                to="/g1/losbandalos/Icesi-Trade/notifications"
+                to="/notifications"
                 sx={{
                   borderRadius: '16px',
                   p: 1.5,
@@ -474,7 +475,7 @@ export default function Navbar() {
               {isMobile && getRolesFromToken()?.includes('ROLE_ADMIN') && (
                 <IconButton
                   component={Link}
-                  to="/g1/losbandalos/Icesi-Trade/admin-panel"
+                  to="/admin-panel"
                   sx={{
                     borderRadius: '16px',
                     p: 1.5,
@@ -492,7 +493,7 @@ export default function Navbar() {
 
               <IconButton
                 component={Link}
-                to="/g1/losbandalos/Icesi-Trade/chat"
+                to="/chat"
                 sx={{
                   borderRadius: '16px',
                   p: 1.5,
@@ -581,7 +582,7 @@ export default function Navbar() {
                 <MenuItem
                   key={index}
                   component={Link}
-                  to={`/g1/losbandalos/Icesi-Trade${item.path}`}
+                  to={item.path}
                   onClick={handleMenuClose}
                   sx={{
                     borderRadius: '12px',
@@ -604,7 +605,7 @@ export default function Navbar() {
               {getRolesFromToken()?.includes('ROLE_ADMIN') && (
                 <MenuItem
                   component={Link}
-                  to="/g1/losbandalos/Icesi-Trade/admin-panel"
+                  to="/admin-panel"
                   onClick={handleMenuClose}
                   sx={{
                     borderRadius: '12px',
@@ -650,7 +651,7 @@ export default function Navbar() {
           </Box>
         )}
       </Toolbar>
-      {renderMobileMenu()}
+      {user && renderMobileMenu()}
     </AppBar>
   );
 }

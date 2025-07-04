@@ -82,12 +82,16 @@ export const getProducts = async (): Promise<Product[]> => {
 };
 
 export const getAvailableProducts = async (): Promise<Product[]> => {
-  const response = await axios.get('/api/products/available', {
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
-      'Content-Type': 'application/json',
-    },
-  });
+  const token = getToken();
+  const headers: any = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await axios.get('/api/products/available', { headers });
   return response.data;
 };
 

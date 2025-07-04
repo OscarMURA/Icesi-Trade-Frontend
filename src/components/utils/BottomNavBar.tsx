@@ -1,15 +1,16 @@
 import { Box, Paper, IconButton, Typography, Fade } from '@mui/material';
 import { ShoppingBag, Heart, PackagePlus, Search, ShoppingCart } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { useTheme, useMediaQuery } from '@mui/material';
+import {  useMediaQuery } from '@mui/material';
 import { useState, useEffect } from 'react';
+import useAuth from '../../hooks/useAuth';
 
 export default function BottomNavBar() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery('(max-width:1030px)');
   const location = useLocation();
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { isAuthenticated } = useAuth();
 
   // Auto-hide en scroll
   useEffect(() => {
@@ -32,38 +33,37 @@ export default function BottomNavBar() {
     }
   }, [lastScrollY]);
 
-  if (!isMobile) return null;
+  if (!isMobile || !isAuthenticated) return null;
 
   // Definir rutas con emojis y labels
   const items = [
     {
-      to: '/g1/losbandalos/Icesi-Trade/my-products',
+      to: '/my-products',
       icon: <ShoppingBag size={22} />,
       active: location.pathname.includes('/my-products'),
       color: '#1976d2',
     },
     {
-      to: '/g1/losbandalos/Icesi-Trade/my-favorites',
+      to: '/my-favorites',
       icon: <Heart size={22} />,
       active: location.pathname.includes('/my-favorites'),
       color: '#f44336',
     },
     {
-      to: '/g1/losbandalos/Icesi-Trade/create-product',
+      to: '/create-product',
       icon: <PackagePlus size={28} />,
       center: true,
       active: location.pathname.includes('/create-product'),
       color: '#6a1b9a',
     },
     {
-      to: '/g1/losbandalos/Icesi-Trade/search',
+      to: '/search',
       icon: <Search size={22} />,
-
       active: location.pathname.includes('/search'),
       color: '#2196f3',
     },
     {
-      to: '/g1/losbandalos/Icesi-Trade/my-purchases',
+      to: '/my-purchases',
       icon: <ShoppingCart size={22} />,
       active: location.pathname.includes('/my-purchases'),
       color: '#4caf50',
@@ -191,7 +191,7 @@ export default function BottomNavBar() {
                 },
               }}
             >
-              {/* Emoji decorativo para botón central */}
+              {/* Icono decorativo para botón central */}
               {item.center && (
                 <Typography
                   sx={{

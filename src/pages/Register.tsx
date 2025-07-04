@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { registerRequest, loginRequest } from '../api/authApi';
 import { RegisterDto } from '../types/authTypes';
 import useAuth from '../hooks/useAuth';
-import { ROUTES } from '../constants/routes';
 
 import { 
   Box, 
@@ -100,7 +99,7 @@ export default function Register() {
 
   // Calcular progreso del formulario
   const getFormProgress = () => {
-    const fields = [form.name, form.email, form.password, form.confirmPassword];
+    const fields = [form.name, form.email, form.phone, form.password, form.confirmPassword];
     const filledFields = fields.filter(field => field.trim() !== '').length;
     return Math.round((filledFields / fields.length) * 100);
   };

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { loginRequest } from '../api/authApi';
 import { LogInDto } from '../types/authTypes';
 import useAuth from '../hooks/useAuth';
-import { ROUTES } from '../constants/routes';
+import { PRODUCTS, REGISTER } from '../constants/routes';
 
 import { 
   Box, 
@@ -39,7 +39,7 @@ export default function Login() {
   const [isHovered, setIsHovered] = useState(false);
 
   const location = useLocation();
-  const from = location.state?.from?.pathname || ROUTES.PRODUCTS;
+  const from = location.state?.from?.pathname || PRODUCTS;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -360,7 +360,7 @@ export default function Login() {
                       color: 'primary.dark',
                     }
                   }}
-                  onClick={() => navigate(ROUTES.REGISTER)}
+                  onClick={() => navigate(REGISTER)}
                 >
                   Regístrate aquí
                 </Box>

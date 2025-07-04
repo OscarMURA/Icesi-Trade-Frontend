@@ -152,7 +152,7 @@ export default function ProductCard({
     if (setInputMessage) {
       setInputMessage(`Buenas, ¿cómo estás? Me interesa este producto: ${product.title}`);
     }
-    navigate('/g1/losbandalos/Icesi-Trade/chat');
+    navigate('/chat');
   };
 
   return (

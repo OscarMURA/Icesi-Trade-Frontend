@@ -149,7 +149,7 @@ export default function CreateProduct() {
       
       // Esperar un poco para mostrar el éxito y luego navegar
       setTimeout(() => {
-        navigate('/g1/losbandalos/Icesi-Trade/my-products');
+        navigate('/my-products');
       }, 1500);
       
     } catch (error) {

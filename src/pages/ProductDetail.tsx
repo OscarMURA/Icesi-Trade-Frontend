@@ -93,13 +93,13 @@ export default function ProductDetail() {
     if (setInputMessage) {
       setInputMessage(`Hola, me interesa tu producto: ${product.title}`);
     }
-    navigate('/g1/losbandalos/Icesi-Trade/chat');
+    navigate('/chat');
   };
 
   const handleMakeOffer = () => {
     if (!user) {
       // Redirigir al login si no está autenticado
-      navigate('/g1/losbandalos/Icesi-Trade/login');
+      navigate('/login');
       return;
     }
     setShowOfferModal(true);

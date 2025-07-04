@@ -55,7 +55,7 @@ class WebSocketService {
 
     this.isConnecting = true;
 
-    const wsUrl = `${this.WS_URL}/g1/losbandalos/ws`;
+    const wsUrl = `${this.WS_URL}/ws`;
 
     this.stompClient = new Client({
       brokerURL: wsUrl,
