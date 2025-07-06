@@ -28,8 +28,12 @@ import {
   LabelRounded,
   ImageRounded,
   DeleteRounded,
+  LocationOnRounded,
+  CategoryRounded,
 } from '@mui/icons-material';
 import { uploadMultipleImages } from '../../api/uploadImage';
+import { getCategories } from '../../api/categoryApi';
+import { Category } from '../../types/categoryTypes';
 
 export default function ProductEditForm({
   product,
@@ -41,27 +45,41 @@ export default function ProductEditForm({
   onUpdate: (p: Product) => void;
 }) {
   const [form, setForm] = useState({
-    title: product.title,
+    title: product.title.slice(0, 40),
     description: product.description,
     price: product.price,
     status: product.status,
     imageUrl: product.imageUrl || '',
+    location: product.location || '',
+    categoryId: product.categoryId || 0,
   });
 
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [existingUrls, setExistingUrls] = useState<string[]>(product.imageUrl ? product.imageUrl.split(',') : []);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     setPreviews(product.imageUrl ? product.imageUrl.split(',') : []);
     setExistingUrls(product.imageUrl ? product.imageUrl.split(',') : []);
   }, [product.imageUrl]);
 
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch(() => {});
+  }, []);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "title") {
+      setForm({ ...form, [name]: value.slice(0, 40) });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +116,12 @@ export default function ProductEditForm({
         uploadedUrls = await uploadMultipleImages(images);
       }
       imageUrl = [...existingUrls, ...uploadedUrls].join(',');
-      const updatedProduct = { ...product, ...form, imageUrl };
+      const updatedProduct = { 
+        ...product, 
+        ...form, 
+        title: form.title.slice(0, 40), // Limita aquí también
+        imageUrl 
+      };
       onUpdate(updatedProduct);
     } catch (err) {
       console.error('Error al subir imagen:', err);
@@ -239,6 +262,7 @@ export default function ProductEditForm({
                   onChange={handleChange}
                   fullWidth
                   variant="outlined"
+                  inputProps={{ maxLength: 40 }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -297,7 +321,51 @@ export default function ProductEditForm({
                       ),
                     }}
                   />
-
+                  <TextField
+                    name="location"
+                    label="Ubicación"
+                    value={form.location}
+                    onChange={handleChange}
+                    sx={{ 
+                      flex: '1 1 200px',
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                      },
+                    }}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LocationOnRounded color="action" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <FormControl sx={{ flex: '1 1 200px' }}>
+                    <InputLabel>Categoría</InputLabel>
+                    <Select
+                      name="categoryId"
+                      value={form.categoryId}
+                      label="Categoría"
+                      onChange={(e) => setForm({ ...form, categoryId: Number(e.target.value) })}
+                      startAdornment={
+                        <InputAdornment position="start">
+                          <CategoryRounded color="action" />
+                        </InputAdornment>
+                      }
+                      sx={{
+                        borderRadius: 2,
+                      }}
+                    >
+                      <MenuItem value={0} disabled>
+                        Selecciona una categoría
+                      </MenuItem>
+                      {categories.map((cat) => (
+                        <MenuItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                   <FormControl sx={{ flex: '1 1 200px' }}>
                     <InputLabel>Estado del producto</InputLabel>
                     <Select

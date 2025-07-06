@@ -62,6 +62,17 @@ export default function ProductInfo({
     navigate(`/products/${product.id}`);
   };
 
+  const MAX_TITLE_LENGTH = 23;
+  const MAX_DESC_LENGTH = 30;
+
+  const displayTitle = product.title.length > MAX_TITLE_LENGTH
+    ? product.title.slice(0, MAX_TITLE_LENGTH) + '...'
+    : product.title;
+
+  const displayDescription = product.description.length > MAX_DESC_LENGTH
+    ? product.description.slice(0, MAX_DESC_LENGTH) + '...'
+    : product.description;
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Imagen del producto con overlay de estado */}
@@ -81,9 +92,13 @@ export default function ProductInfo({
             image={(product.imageUrl?.split(',')[0]) || defaultImage}
             alt={product.title}
             sx={{ 
-              height: 200, // Tamaño fijo predeterminado
-              width: '100%', 
+              height: 200,
+              width: '100%',
+              maxWidth: '100%',
+              maxHeight: 200,
+              aspectRatio: '4/3',
               objectFit: 'cover',
+              backgroundColor: '#f5f5f5',
               borderRadius: 0,
               transition: 'transform 0.3s ease',
               '&:hover': {
@@ -211,9 +226,10 @@ export default function ProductInfo({
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
+            overflowWrap: 'anywhere',
           }}
         >
-          {product.title}
+          {displayTitle}
         </Typography>
 
         {/* Descripción */}
@@ -228,9 +244,10 @@ export default function ProductInfo({
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             flexGrow: 1,
+            overflowWrap: 'anywhere',
           }}
         >
-          {product.description}
+          {displayDescription}
         </Typography>
 
         {/* Precio destacado */}

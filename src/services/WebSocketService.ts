@@ -201,10 +201,15 @@ class WebSocketService {
     };
 
     try {
+      console.log('Enviando mensaje por WebSocket:', messageObj);
       this.stompClient.publish({
         destination: '/app/chat.private',
-        body: JSON.stringify(messageObj)
+        body: JSON.stringify(messageObj),
+        headers: {
+          'content-type': 'application/json'
+        }
       });
+      console.log('Mensaje enviado exitosamente');
     } catch (error) {
       console.error('Error al enviar mensaje:', error);
       throw error;

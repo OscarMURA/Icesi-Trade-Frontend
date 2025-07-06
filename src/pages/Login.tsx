@@ -69,8 +69,14 @@ export default function Login() {
       localStorage.setItem('token', response.token);
       login(response);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || err.message || 'Error al iniciar sesión. Por favor intente nuevamente.';
-      setError(errorMessage);
+      const errorMessage = err.response?.data?.error || err.message || 'Error al iniciar sesión.';
+      
+      // ✅ Manejo específico para cuentas no verificadas
+      if (errorMessage.includes('verificada') || errorMessage.includes('habilitada')) {
+        setError('Tu cuenta no está verificada. Revisa tu email y haz clic en el enlace de verificación.');
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

@@ -126,9 +126,7 @@ export default function ProductList({
               <Fade in timeout={600 + (index * 100)}>
                 <Box 
                   sx={{ 
-                    height: '100%',
-                    minHeight: 500,
-                    maxHeight: 600,
+                    height: 'auto',
                     display: 'flex',
                     flexDirection: 'column'
                   }}

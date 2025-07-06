@@ -41,3 +41,13 @@ export const getReviewsByReviewer = async (reviewerId: number): Promise<Review[]
   });
   return response.data;
 };
+
+export const getReviewsByReviewee = async (revieweeId: number): Promise<Review[]> => {
+  const response = await axios.get('/api/reviews', {
+    params: { revieweeId },
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+  return response.data;
+};

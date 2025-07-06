@@ -28,9 +28,50 @@ const ChatPage: React.FC = () => {
   const handleReceiveMessage = useCallback((msg: any) => {
     try {
       const message = JSON.parse(msg.body);
+      console.log('Mensaje recibido por WebSocket:', message);
+      
       if (selectedUser && 
           (message.senderId === selectedUser.id || message.receiverId === selectedUser.id)) {
-        setMessages(prev => [...prev, message]);
+        setMessages(prev => {
+          // Si es un mensaje temporal (sin ID), agregarlo directamente
+          if (message.id === null || message.isTemporary) {
+            console.log('Agregando mensaje temporal');
+            return [...prev, message];
+          }
+          
+          // Buscar si hay un mensaje temporal que coincida con este mensaje real
+          const tempMessageIndex = prev.findIndex(existingMsg => 
+            existingMsg.isTemporary && 
+            existingMsg.content === message.content && 
+            existingMsg.senderId === message.senderId && 
+            existingMsg.receiverId === message.receiverId
+          );
+          
+          if (tempMessageIndex !== -1) {
+            console.log('Reemplazando mensaje temporal con real');
+            // Reemplazar el mensaje temporal con el real
+            const newMessages = [...prev];
+            newMessages[tempMessageIndex] = message;
+            return newMessages;
+          }
+          
+          // Verificar si el mensaje ya existe para evitar duplicados
+          const messageExists = prev.some(existingMsg => 
+            existingMsg.id === message.id || 
+            (existingMsg.content === message.content && 
+             existingMsg.senderId === message.senderId && 
+             existingMsg.receiverId === message.receiverId &&
+             Math.abs(new Date(existingMsg.createdAt).getTime() - new Date(message.createdAt).getTime()) < 5000) // 5 segundos de tolerancia
+          );
+          
+          if (messageExists) {
+            console.log('Mensaje duplicado, ignorando');
+            return prev; // No agregar si ya existe
+          }
+          
+          console.log('Agregando nuevo mensaje');
+          return [...prev, message];
+        });
       }
     } catch (err) {
       console.error('Error al procesar mensaje:', err);
@@ -186,6 +227,15 @@ const ChatPage: React.FC = () => {
     }
   }, [inputMessage, setInputMessage]);
 
+  // Limpiar mensajes temporales después de 10 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessages(prev => prev.filter(msg => !msg.isTemporary || Date.now() - new Date(msg.createdAt).getTime() < 10000));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleRetry = async () => {
     setError(null);
     setIsLoading(true);
@@ -209,15 +259,18 @@ const ChatPage: React.FC = () => {
         setIsConnected(true);
       }
 
+      console.log('Enviando mensaje:', message);
       WebSocketService.sendMessage(user.id, selectedUser.id, message);
-      // Notificar al receptor del mensaje
-      await addNotification({
+      
+      // Notificar al receptor del mensaje (de forma asíncrona para no bloquear)
+      addNotification({
         createdAt: new Date().toISOString(),
         typeId: 1, // 1 = MESSAGE
         read: false,
-        userId: selectedUser.id, // <-- El receptor del mensaje
+        userId: selectedUser.id,
         message: `Has recibido un mensaje de ${user.name}`,
-      });
+      }).catch(err => console.error('Error enviando notificación:', err));
+      
       setMessage('');
       setInputMessage('');
     } catch (err) {

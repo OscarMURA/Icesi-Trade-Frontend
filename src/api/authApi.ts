@@ -41,3 +41,35 @@ export async function registerRequest(data: RegisterDto): Promise<void> {
     throw new Error('No se pudo completar el registro. Intenta más tarde.');
   }
 }
+
+export async function verifyEmail(token: string): Promise<any> {
+  try {
+    const response = await axios.post(`/api/auth/verify-email?token=${token}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en verifyEmail:', error);
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Error verificando email');
+    } else if (error.request) {
+      throw new Error('No se pudo conectar con el servidor');
+    } else {
+      throw new Error('Error al procesar la verificación: ' + error.message);
+    }
+  }
+}
+
+export async function resendVerification(email: string): Promise<any> {
+  try {
+    const response = await axios.post(`/api/auth/resend-verification?email=${email}`);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en resendVerification:', error);
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Error reenviando verificación');
+    } else if (error.request) {
+      throw new Error('No se pudo conectar con el servidor');
+    } else {
+      throw new Error('Error al procesar la solicitud: ' + error.message);
+    }
+  }
+}

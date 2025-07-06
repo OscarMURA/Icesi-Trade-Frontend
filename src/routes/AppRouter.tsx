@@ -16,6 +16,9 @@ import MyFavoriteProducts from '../pages/MyFavoriteProducts';
 import MyPurchases from '../pages/MyPurchases';
 import UserNotifications from '../components/UserNotifications';
 import AdminUserPanel from '../pages/AdminUserPanel';
+import EmailVerification from '../pages/EmailVerification';
+import VerificationPending from '../pages/VerificationPending';
+import UserProfile from '../pages/UserProfile';
 
 const router = createBrowserRouter([
   { 
@@ -39,10 +42,19 @@ const router = createBrowserRouter([
         element: <ProductSearch />
       },
       {
+        path: 'verify-email',
+        element: <EmailVerification />
+      },
+      {
+        path: 'verification-pending',
+        element: <VerificationPending />
+      },
+      {
         path: '',
         element: <AuthWrapper authorities={['ROLE_USER', 'ROLE_ADMIN']} />,
         children: [
           { path: 'profile', element: <Profile /> },
+          { path: 'user/:userId', element: <UserProfile /> },
           { path: 'products', element: <ProductList /> },
           { path: 'products/:id', element: <ProductDetail /> },
           { path: 'my-favorites', element: <MyFavoriteProducts /> },

@@ -135,7 +135,7 @@ export default function CreateProduct() {
     setError('');
     
     try {
-      const finalForm = { ...form };
+      const finalForm = { ...form, title: form.title.slice(0, 40) };
       
       if (images.length > 0) {
         // Subir múltiples imágenes de una vez
@@ -443,10 +443,11 @@ export default function CreateProduct() {
                     label="Título del producto"
                     name="title"
                     value={form.title}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    onChange={(e) => setForm({ ...form, title: e.target.value.slice(0, 40) })}
                     fullWidth
                     variant="outlined"
                     required
+                    inputProps={{ maxLength: 40 }}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">

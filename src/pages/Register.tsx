@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { registerRequest, loginRequest } from '../api/authApi';
+import { registerRequest} from '../api/authApi';
 import { RegisterDto } from '../types/authTypes';
-import useAuth from '../hooks/useAuth';
+import { LOGIN } from '../constants/routes';
 
 import { 
   Box, 
@@ -31,7 +31,6 @@ import {
 
 export default function Register() {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [form, setForm] = useState<RegisterDto>({
     name: '',
@@ -78,17 +77,15 @@ export default function Register() {
 
     try {
       await registerRequest(form);
-      const response = await loginRequest({
-        email: form.email,
-        password: form.password,
+      
+      // ✅ Registro exitoso - redirigir a página de verificación pendiente
+      navigate('/verification-pending', { 
+        state: { 
+          email: form.email,
+          message: '¡Registro exitoso! Revisa tu email para verificar tu cuenta. Si no recibes el email, puedes solicitar un reenvío.'
+        } 
       });
-      if (!response || !response.token) {
-        throw new Error('No se recibió un token válido del servidor');
-      }
-      localStorage.setItem('username', response.name);
-      localStorage.setItem('token', response.token);
-      login(response);
-      navigate(ROUTES.PROFILE);
+      
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.message || 'Error inesperado al registrar la cuenta.';
       setError(errorMessage);
@@ -598,7 +595,7 @@ export default function Register() {
                       color: 'primary.dark',
                     }
                   }}
-                  onClick={() => navigate(ROUTES.LOGIN)}
+                  onClick={() => navigate(LOGIN)}
                 >
                   Inicia sesión aquí
                 </Box>

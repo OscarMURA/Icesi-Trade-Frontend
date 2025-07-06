@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -15,7 +16,7 @@ import {
   LocationOn,
   CalendarToday,
   Person,
-  Category,
+  Category as CategoryIcon,
   Star,
   Favorite,
   FavoriteBorder,
@@ -23,12 +24,15 @@ import {
   Visibility,
   TrendingUp,
   LocalOffer,
+  AccountCircle,
 } from '@mui/icons-material';
 import { Product } from '../../types/productTypes';
 import { getFavoriteProductsByUser, toggleFavoriteProduct } from '../../api/favoriteApi';
 import { getIdFromToken, getUserById } from '../../api/userServices';
 import useAuth from '../../hooks/useAuth';
 import { UserResponseDto } from '../../types/userTypes';
+import { getCategories } from '../../api/categoryApi';
+import { Category } from '../../types/categoryTypes';
 
 interface ProductDetailsInfoProps {
   product: Product;
@@ -42,9 +46,17 @@ export default function ProductDetailsInfo({
   onMakeOffer,
 }: ProductDetailsInfoProps) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [sellerName, setSellerName] = useState<string>('');
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch(() => {});
+  }, []);
 
   const isOwner = user && product.sellerId === getIdFromToken();
 
@@ -98,6 +110,10 @@ export default function ProductDetailsInfo({
       navigator.clipboard.writeText(window.location.href);
       // Aquí podrías mostrar un toast de confirmación
     }
+  };
+
+  const handleViewSellerProfile = () => {
+    navigate(`/user/${product.sellerId}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -264,13 +280,15 @@ export default function ProductDetailsInfo({
                   </Stack>
                   
                   <Stack direction="row" alignItems="center" spacing={2}>
-                    <Category color="primary" />
+                    <CategoryIcon color="primary" />
                     <Box>
                       <Typography variant="body2" color="text.secondary">
                         Categoría
                       </Typography>
                       <Typography variant="body1" fontWeight={500}>
-                        ID: {product.categoryId}
+                        {categories.length > 0
+                          ? categories.find((cat) => cat.id === product.categoryId)?.name || `ID: ${product.categoryId}`
+                          : `ID: ${product.categoryId}`}
                       </Typography>
                     </Box>
                   </Stack>
@@ -323,7 +341,7 @@ export default function ProductDetailsInfo({
                 
                 <Stack direction="row" alignItems="center" spacing={2}>
                   <Person color="primary" />
-                  <Box>
+                  <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" color="text.secondary">
                       Vendedor
                     </Typography>
@@ -331,6 +349,21 @@ export default function ProductDetailsInfo({
                       {sellerName}
                     </Typography>
                   </Box>
+                  <Tooltip title="Ver perfil del vendedor">
+                    <IconButton
+                      onClick={handleViewSellerProfile}
+                      size="small"
+                      sx={{
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        '&:hover': {
+                          bgcolor: 'primary.dark',
+                        },
+                      }}
+                    >
+                      <AccountCircle />
+                    </IconButton>
+                  </Tooltip>
                 </Stack>
                 
                 <Stack direction="row" alignItems="center" spacing={2}>
