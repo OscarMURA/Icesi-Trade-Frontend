@@ -7,7 +7,6 @@ import {
   Box,
   Typography,
   Container,
-  Grid,
   Paper,
   Skeleton,
   Fade,
@@ -131,8 +130,13 @@ const EmptyState = ({ onRefresh }: { onRefresh: () => void }) => (
 // Componente de estadísticas
 const StatsSection = ({ totalFavorites, avgPrice }: { totalFavorites: number; avgPrice: number }) => (
   <Fade in timeout={400}>
-    <Grid container spacing={3} sx={{ mb: 4 }}>
-      <Grid item xs={12} sm={6}>
+    <Box sx={{ 
+      display: 'grid', 
+      gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, 
+      gap: 3, 
+      mb: 4 
+    }}>
+      <Box>
         <Paper
           elevation={0}
           sx={{
@@ -166,9 +170,9 @@ const StatsSection = ({ totalFavorites, avgPrice }: { totalFavorites: number; av
             </Box>
           </Stack>
         </Paper>
-      </Grid>
+      </Box>
 
-      <Grid item xs={12} sm={6}>
+      <Box>
         <Paper
           elevation={0}
           sx={{
@@ -202,8 +206,8 @@ const StatsSection = ({ totalFavorites, avgPrice }: { totalFavorites: number; av
             </Box>
           </Stack>
         </Paper>
-      </Grid>
-    </Grid>
+      </Box>
+    </Box>
   </Fade>
 );
 
@@ -351,13 +355,22 @@ export default function MyFavoriteProducts() {
 
       {/* Contenido principal */}
       {isLoading ? (
-        <Grid container spacing={3}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { 
+            xs: '1fr', 
+            sm: 'repeat(2, 1fr)', 
+            md: 'repeat(3, 1fr)', 
+            lg: 'repeat(4, 1fr)' 
+          }, 
+          gap: 3 
+        }}>
           {[...Array(8)].map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <Box key={index}>
               <ProductSkeleton />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : listProducts.length === 0 ? (
         <EmptyState onRefresh={fetchFavorites} />
       ) : (

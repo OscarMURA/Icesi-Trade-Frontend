@@ -169,7 +169,7 @@ export default function UnifiedSearchForm({
                     autoComplete="off"
                     variant="outlined"
                     fullWidth
-                    size="large"
+                    size="medium"
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     InputProps={{
@@ -225,7 +225,7 @@ export default function UnifiedSearchForm({
                   <Button
                     type="submit"
                     variant="contained"
-                    size="large"
+                    size="medium"
                     sx={{ 
                       borderRadius: 3,
                       px: 4,

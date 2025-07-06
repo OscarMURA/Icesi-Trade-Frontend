@@ -70,7 +70,7 @@ export default function ProductOfferModal({
         buyerId: getIdFromToken(),
         productId: product.id,
         price: price,
-        status: 'pending',
+        status: 'pending' as const,
       };
 
       await createSale(offer);

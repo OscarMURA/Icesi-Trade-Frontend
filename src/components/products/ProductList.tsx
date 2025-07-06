@@ -2,7 +2,6 @@ import { useState } from 'react';
 import type { Product } from '../../types/productTypes';
 import ProductCard from './ProductCard';
 import {
-  Grid,
   Pagination,
   Box,
   Typography,
@@ -38,18 +37,25 @@ export default function ProductList({
   if (loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Grid container spacing={3}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { 
+            xs: '1fr', 
+            sm: 'repeat(2, 1fr)', 
+            md: 'repeat(3, 1fr)', 
+            lg: 'repeat(4, 1fr)' 
+          }, 
+          gap: 3 
+        }}>
           {Array.from({ length: 8 }).map((_, i) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
-              <Box sx={{ bgcolor: 'white', borderRadius: 4, p: 2 }}>
-                <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2, mb: 2 }} />
-                <Skeleton variant="text" height={32} sx={{ mb: 1 }} />
-                <Skeleton variant="text" height={20} sx={{ mb: 2 }} />
-                <Skeleton variant="text" height={28} width="60%" />
-              </Box>
-            </Grid>
+            <Box key={i} sx={{ bgcolor: 'white', borderRadius: 4, p: 2 }}>
+              <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 2, mb: 2 }} />
+              <Skeleton variant="text" height={32} sx={{ mb: 1 }} />
+              <Skeleton variant="text" height={20} sx={{ mb: 2 }} />
+              <Skeleton variant="text" height={28} width="60%" />
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
     );
   }
@@ -101,28 +107,24 @@ export default function ProductList({
  
       {/* Grid de productos con altura uniforme */}
       <Fade in timeout={800}>
-        <Grid
-          container
-          spacing={3}
-          justifyContent="center"
-          alignItems="stretch"
-          sx={{
-            '& .MuiGrid-item': {
-              display: 'flex',
-              flexDirection: 'column'
-            }
-          }}
-        >
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { 
+            xs: '1fr', 
+            sm: 'repeat(2, 1fr)', 
+            md: 'repeat(3, 1fr)', 
+            lg: 'repeat(4, 1fr)' 
+          }, 
+          gap: 3,
+          justifyContent: 'center',
+          alignItems: 'stretch'
+        }}>
           {paginatedProducts.map((product, index) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              xl={3}
-              key={product.id}
-            >
+            <Box key={product.id} sx={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              height: 'auto'
+            }}>
               <Fade in timeout={600 + (index * 100)}>
                 <Box 
                   sx={{ 
@@ -134,9 +136,9 @@ export default function ProductList({
                   <ProductCard product={product} />
                 </Box>
               </Fade>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Fade>
 
       {/* Paginación */}

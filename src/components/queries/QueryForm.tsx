@@ -85,7 +85,7 @@ export default function QueryForm({ onSearch, searchQuery, setSearchQuery }: Que
                   autoComplete="off"
                   variant="outlined"
                   fullWidth
-                  size="large"
+                  size="medium"
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
                   InputProps={{
@@ -141,7 +141,7 @@ export default function QueryForm({ onSearch, searchQuery, setSearchQuery }: Que
                 <Button
                   type="submit"
                   variant="contained"
-                  size="large"
+                  size="medium"
                   disabled={!searchQuery.trim()}
                   sx={{ 
                     borderRadius: 3,

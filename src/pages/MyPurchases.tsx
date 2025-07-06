@@ -10,7 +10,6 @@ import {
   Typography,
   Button,
   Container,
-  Grid,
   Paper,
   Skeleton,
   Fade,
@@ -237,8 +236,13 @@ export default function MyPurchases() {
       {/* Estadísticas */}
       {!isLoading && purchasedProducts.length > 0 && (
         <Fade in timeout={400}>
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={4}>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, 
+            gap: 3, 
+            mb: 4 
+          }}>
+            <Box>
               <Paper
                 elevation={0}
                 sx={{
@@ -272,9 +276,9 @@ export default function MyPurchases() {
                   </Box>
                 </Stack>
               </Paper>
-            </Grid>
+            </Box>
 
-            <Grid item xs={12} sm={4}>
+            <Box>
               <Paper
                 elevation={0}
                 sx={{
@@ -308,9 +312,9 @@ export default function MyPurchases() {
                   </Box>
                 </Stack>
               </Paper>
-            </Grid>
+            </Box>
 
-            <Grid item xs={12} sm={4}>
+            <Box>
               <Paper
                 elevation={0}
                 sx={{
@@ -344,8 +348,8 @@ export default function MyPurchases() {
                   </Box>
                 </Stack>
               </Paper>
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Fade>
       )}
 
@@ -382,20 +386,38 @@ export default function MyPurchases() {
 
       {/* Contenido principal */}
       {isLoading ? (
-        <Grid container spacing={3}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { 
+            xs: '1fr', 
+            sm: 'repeat(2, 1fr)', 
+            md: 'repeat(3, 1fr)', 
+            lg: 'repeat(4, 1fr)' 
+          }, 
+          gap: 3 
+        }}>
           {[...Array(8)].map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={`skeleton-${index}`}>
+            <Box key={`skeleton-${index}`}>
               <ProductSkeleton />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       ) : purchasedProducts.length === 0 ? (
         <EmptyState onRefresh={fetchData} />
       ) : (
         <Fade in timeout={600}>
-          <Grid container spacing={3}>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { 
+              xs: '1fr', 
+              sm: 'repeat(2, 1fr)', 
+              md: 'repeat(3, 1fr)', 
+              lg: 'repeat(4, 1fr)' 
+            }, 
+            gap: 3 
+          }}>
             {uniquePurchasedProducts.map((product, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+              <Box key={product.id}>
                 <Fade in timeout={300 + index * 100}>
                   <Box>
                     <ProductCard product={product} hideOffersAndEdit />
@@ -449,9 +471,9 @@ export default function MyPurchases() {
                     )}
                   </Box>
                 </Fade>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Fade>
       )}
 

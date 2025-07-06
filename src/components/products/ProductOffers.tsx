@@ -115,7 +115,7 @@ export default function ProductOffers({ productId, onClose }: ProductOffersProps
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | undefined) => {
     switch (status) {
       case 'accepted': return 'success';
       case 'rejected': return 'error';
@@ -124,12 +124,12 @@ export default function ProductOffers({ productId, onClose }: ProductOffersProps
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: string | undefined) => {
     switch (status) {
       case 'accepted': return 'Aceptada';
       case 'rejected': return 'Rechazada';
       case 'pending': return 'Pendiente';
-      default: return status;
+      default: return status || 'Desconocido';
     }
   };
 

@@ -1,4 +1,4 @@
-import { Box, Paper, IconButton, Typography, Fade } from '@mui/material';
+import { Box, Paper, IconButton,  Fade } from '@mui/material';
 import { ShoppingBag, Heart, PackagePlus, Search, ShoppingCart } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import {  useMediaQuery } from '@mui/material';
@@ -35,7 +35,7 @@ export default function BottomNavBar() {
 
   if (!isMobile || !isAuthenticated) return null;
 
-  // Definir rutas con emojis y labels
+  // Definir rutas
   const items = [
     {
       to: '/my-products',
@@ -191,44 +191,11 @@ export default function BottomNavBar() {
                 },
               }}
             >
-              {/* Icono decorativo para botón central */}
-              {item.center && (
-                <Typography
-                  sx={{
-                    position: 'absolute',
-                    top: -2,
-                    right: -2,
-                    fontSize: '12px',
-                    animation: 'bounce 2s infinite',
-                    '@keyframes bounce': {
-                      '0%, 20%, 50%, 80%, 100%': { transform: 'translateY(0)' },
-                      '40%': { transform: 'translateY(-4px)' },
-                      '60%': { transform: 'translateY(-2px)' },
-                    },
-                  }}
-                >
-                  {item.emoji}
-                </Typography>
-              )}
+
               {item.icon}
             </IconButton>
 
-            {/* Label con animación */}
-            <Typography
-              variant="caption"
-              sx={{
-                color: item.active ? item.color : '#757575',
-                fontWeight: item.active ? 600 : 400,
-                fontSize: '11px',
-                mt: 0.5,
-                transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
-                transform: item.active ? 'scale(1.05)' : 'scale(1)',
-                textAlign: 'center',
-                lineHeight: 1,
-              }}
-            >
-              {item.label}
-            </Typography>
+
 
             {/* Dot indicator para item activo */}
             {item.active && !item.center && (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { HOME } from '../constants/routes';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const LoginPage = () => {
       localStorage.setItem('token', data.token);
 
       // Redirigir a la página anterior o al home
-      const from = (location.state as any)?.from?.pathname || ROUTES.HOME;
+      const from = (location.state as any)?.from?.pathname || HOME;
       navigate(from, { replace: true });
     } catch (error: any) {
       console.error('Error en login:', error);

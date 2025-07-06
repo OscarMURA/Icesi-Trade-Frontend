@@ -3,20 +3,13 @@ import { ShoppingBag, Star, TrendingUp, Person } from '@mui/icons-material';
 import Rating from '@mui/material/Rating';
 import Alert from '@mui/material/Alert';
 import React from 'react';
+import { Review } from '../../types/reviewTypes';
 
 interface Stats {
   productos: number;
   vendidos: number;
   promedio: number;
   totalReviews: number;
-}
-
-interface Review {
-  id: number | undefined;
-  rating: number;
-  comment: string;
-  createdAt?: string;
-  reviewerId: number;
 }
 
 interface UserStatsAndReviewsProps {
@@ -101,8 +94,8 @@ const UserStatsAndReviews: React.FC<UserStatsAndReviewsProps> = ({ stats, review
         </Typography>
       ) : (
         <Stack spacing={3} sx={{ mt: 2 }}>
-          {reviews.map((review) => (
-            <Paper key={review.id} elevation={1} sx={{ p: 2, borderRadius: 2 }}>
+          {reviews.map((review, index) => (
+            <Paper key={review.id || index} elevation={1} sx={{ p: 2, borderRadius: 2 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                 <Rating value={review.rating} readOnly precision={0.5} />
                 <Typography variant="body1" color="text.primary" sx={{ flex: 1 }}>

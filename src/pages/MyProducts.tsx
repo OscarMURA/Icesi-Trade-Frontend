@@ -7,7 +7,6 @@ import {
   Box,
   Typography,
   Container,
-  Grid,
   Paper,
   Skeleton,
   Fade,
@@ -304,8 +303,13 @@ export default function MyProducts() {
       {/* Estadísticas */}
       {!isLoading && allProducts.length > 0 && (
         <Fade in timeout={400}>
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, 
+            gap: 3, 
+            mb: 4 
+          }}>
+            <Box>
               <StatsCard
                 title="Total productos"
                 value={stats.totalProducts}
@@ -313,9 +317,9 @@ export default function MyProducts() {
                 color="#2196f3"
                 bgColor="#e3f2fd"
               />
-            </Grid>
+            </Box>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Box>
               <StatsCard
                 title="Productos activos"
                 value={stats.activeProducts}
@@ -323,9 +327,9 @@ export default function MyProducts() {
                 color="#ff9800"
                 bgColor="#fff3e0"
               />
-            </Grid>
+            </Box>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Box>
               <StatsCard
                 title="Productos vendidos"
                 value={stats.soldProducts}
@@ -333,9 +337,9 @@ export default function MyProducts() {
                 color="#4caf50"
                 bgColor="#e8f5e8"
               />
-            </Grid>
+            </Box>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Box>
               <StatsCard
                 title="Total ganado"
                 value={`$${stats.totalEarnings.toLocaleString()}`}
@@ -343,8 +347,8 @@ export default function MyProducts() {
                 color="#9c27b0"
                 bgColor="#f3e5f5"
               />
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
         </Fade>
       )}
 
@@ -426,28 +430,48 @@ export default function MyProducts() {
       {/* Contenido de las pestañas */}
       <TabPanel value={tabValue} index={0}>
         {isLoading ? (
-          <Grid container spacing={3}>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { 
+              xs: '1fr', 
+              sm: 'repeat(2, 1fr)', 
+              md: 'repeat(3, 1fr)', 
+              lg: 'repeat(4, 1fr)' 
+            }, 
+            gap: 3 
+          }}>
             {[...Array(8)].map((_, index) => (
-              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+              <Box key={index}>
                 <ProductSkeleton />
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         ) : filteredProducts.length === 0 ? (
           <EmptyState onRefresh={fetchProducts} isSold={false} />
         ) : (
           <Fade in timeout={600}>
-            <Grid container spacing={3} sx={{ justifyContent: 'center', alignItems: 'stretch' }}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { 
+                xs: '1fr', 
+                sm: 'repeat(2, 1fr)', 
+                md: 'repeat(3, 1fr)', 
+                lg: 'repeat(4, 1fr)' 
+              }, 
+              gap: 3,
+              justifyContent: 'center',
+              alignItems: 'stretch'
+            }}>
               {filteredProducts.map((product, index) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+                <Box key={product.id}>
                   <Fade in timeout={300 + index * 100}>
                     <Box>
                       <ProductCard product={product} />
                     </Box>
                   </Fade>
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
           </Fade>
         )}
       </TabPanel>
@@ -457,17 +481,28 @@ export default function MyProducts() {
           <EmptyState onRefresh={fetchProducts} isSold={true} />
         ) : (
           <Fade in timeout={600}>
-            <Grid container spacing={3} sx={{ justifyContent: 'center', alignItems: 'stretch' }}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { 
+                xs: '1fr', 
+                sm: 'repeat(2, 1fr)', 
+                md: 'repeat(3, 1fr)', 
+                lg: 'repeat(4, 1fr)' 
+              }, 
+              gap: 3,
+              justifyContent: 'center',
+              alignItems: 'stretch'
+            }}>
               {filteredProducts.map((product, index) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={product.id}>
+                <Box key={product.id}>
                   <Fade in timeout={300 + index * 100}>
                     <Box>
                       <ProductCard product={product} hideOffersAndEdit />
                     </Box>
                   </Fade>
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
           </Fade>
         )}
       </TabPanel>

@@ -1,6 +1,5 @@
 import { 
   Box, 
-  Grid, 
   Card, 
   CardContent, 
   Typography, 
@@ -151,9 +150,18 @@ export default function QueryResults({
           <Skeleton variant="text" width={150} height={24} />
         </Box>
         
-        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { 
+            xs: '1fr', 
+            sm: 'repeat(2, 1fr)', 
+            md: 'repeat(3, 1fr)', 
+            lg: 'repeat(4, 1fr)' 
+          }, 
+          gap: { xs: 2, sm: 3, md: 4 } 
+        }}>
           {[...Array(isMobile ? 2 : isTablet ? 4 : 8)].map((_, i) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
+            <Box key={i}>
               <Card sx={{ borderRadius: 3 }}>
                 <Skeleton variant="rectangular" height={200} />
                 <CardContent>
@@ -162,9 +170,9 @@ export default function QueryResults({
                   <Skeleton variant="text" width="40%" height={32} />
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
     );
   }
@@ -333,32 +341,34 @@ export default function QueryResults({
     <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 } }}>
       <ResultsHeader />
       
-      <Grid 
-        container 
-        spacing={{ xs: 2, sm: 3, md: 4 }}
-        sx={{
-          '& .MuiGrid-item': {
-            display: 'flex',
-          }
-        }}
-      >
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { 
+          xs: '1fr', 
+          sm: 'repeat(2, 1fr)', 
+          md: viewMode === 'list' ? '1fr' : 'repeat(3, 1fr)', 
+          lg: viewMode === 'list' ? '1fr' : 'repeat(4, 1fr)' 
+        }, 
+        gap: { xs: 2, sm: 3, md: 4 },
+        '& > *': {
+          display: 'flex',
+        }
+      }}>
         {results.map((product, index) => (
-          <Grid 
-            item 
-            xs={12} 
-            sm={6} 
-            md={viewMode === 'list' ? 12 : 4} 
-            lg={viewMode === 'list' ? 12 : 3} 
+          <Box 
             key={product.id}
+            sx={{
+              gridColumn: viewMode === 'list' ? '1 / -1' : 'auto'
+            }}
           >
-            <Fade in timeout={300 + (index * 50)}>
-              <Box sx={{ width: '100%' }}>
-                <ProductCard product={product} />
-              </Box>
-            </Fade>
-          </Grid>
-        ))}
-      </Grid>
+                          <Fade in timeout={300 + (index * 50)}>
+                <Box sx={{ width: '100%' }}>
+                  <ProductCard product={product} />
+                </Box>
+              </Fade>
+            </Box>
+          ))}
+        </Box>
       
       {/* Load more button placeholder */}
       {results.length > 12 && (
