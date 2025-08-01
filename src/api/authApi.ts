@@ -1,7 +1,7 @@
 import axios from './axiosConfig';
-import { LogInDto, TokenDto, RegisterDto } from '../types/authTypes';
+import { LogInDto, TokenDto, RegisterDto, LoginResponse } from '../types/authTypes';
 
-export async function loginRequest(data: LogInDto): Promise<TokenDto> {
+export async function loginRequest(data: LogInDto): Promise<TokenDto | LoginResponse> {
   try {
     console.log('Intentando login con:', { email: data.email, password: '***' });
     const response = await axios.post('/api/auth/login', data);
@@ -66,6 +66,38 @@ export async function resendVerification(email: string): Promise<any> {
     console.error('Error en resendVerification:', error);
     if (error.response) {
       throw new Error(error.response.data?.error || 'Error reenviando verificación');
+    } else if (error.request) {
+      throw new Error('No se pudo conectar con el servidor');
+    } else {
+      throw new Error('Error al procesar la solicitud: ' + error.message);
+    }
+  }
+}
+
+export async function getVerificationStatus(): Promise<any> {
+  try {
+    const response = await axios.get('/api/auth/verification-status');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en getVerificationStatus:', error);
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Error obteniendo estado de verificación');
+    } else if (error.request) {
+      throw new Error('No se pudo conectar con el servidor');
+    } else {
+      throw new Error('Error al procesar la solicitud: ' + error.message);
+    }
+  }
+}
+
+export async function requestVerification(): Promise<any> {
+  try {
+    const response = await axios.post('/api/auth/request-verification');
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en requestVerification:', error);
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Error solicitando verificación');
     } else if (error.request) {
       throw new Error('No se pudo conectar con el servidor');
     } else {

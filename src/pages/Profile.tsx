@@ -11,6 +11,7 @@ import {
 import { UserResponseDto } from '../types/userTypes';
 import UserInfo from '../components/profile/UserInfo';
 import UserEditForm from '../components/profile/UserEditForm';
+import EmailVerificationStatus from '../components/profile/EmailVerificationStatus';
 import { getUserById } from '../api/userServices';
 import { getIdFromToken, getToken } from '../api/userServices';
 import UserStatsAndReviews from '../components/profile/UserStatsAndReviews';
@@ -225,6 +226,7 @@ export default function Profile() {
           <Fade in={!editing} timeout={400} unmountOnExit>
             <Box>
               <UserInfo user={profile} onEdit={handleEdit} />
+              <EmailVerificationStatus />
             </Box>
           </Fade>
 

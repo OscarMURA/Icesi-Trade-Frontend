@@ -13,6 +13,12 @@ export type TokenDto = {
   expirationDate: number;
 };
 
+export type LoginResponse = {
+  token: TokenDto;
+  verified: boolean;
+  message: string;
+};
+
 export type RegisterDto = {
   name: string;
   email: string;

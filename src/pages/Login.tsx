@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loginRequest } from '../api/authApi';
-import { LogInDto } from '../types/authTypes';
+import { LogInDto, LoginResponse, TokenDto } from '../types/authTypes';
 import useAuth from '../hooks/useAuth';
 import { PRODUCTS, REGISTER } from '../constants/routes';
 
@@ -62,21 +62,34 @@ export default function Login() {
         throw new Error('Por favor complete todos los campos');
       }
       const response = await loginRequest(form);
-      if (!response || !response.token) {
+      
+      // Manejar la nueva respuesta que puede incluir información sobre verificación
+      if ('verified' in response && response.token && typeof response.token === 'object') {
+        // Si la respuesta tiene la estructura nueva con token anidado
+        const loginResponse = response as LoginResponse;
+        const tokenData = loginResponse.token;
+        const isVerified = loginResponse.verified;
+        
+        localStorage.setItem('username', tokenData.name);
+        localStorage.setItem('token', tokenData.token);
+        login(tokenData);
+        
+        // Mostrar mensaje sobre el estado de verificación
+        if (!isVerified) {
+          setError('Login exitoso. Tu cuenta no está verificada. Puedes verificar tu email más tarde desde tu perfil.');
+        }
+      } else if ('name' in response && 'token' in response) {
+        // Estructura anterior
+        const tokenDto = response as TokenDto;
+        localStorage.setItem('username', tokenDto.name);
+        localStorage.setItem('token', tokenDto.token);
+        login(tokenDto);
+      } else {
         throw new Error('No se recibió un token válido del servidor');
       }
-      localStorage.setItem('username', response.name);
-      localStorage.setItem('token', response.token);
-      login(response);
     } catch (err: any) {
       const errorMessage = err.response?.data?.error || err.message || 'Error al iniciar sesión.';
-      
-      // ✅ Manejo específico para cuentas no verificadas
-      if (errorMessage.includes('verificada') || errorMessage.includes('habilitada')) {
-        setError('Tu cuenta no está verificada. Revisa tu email y haz clic en el enlace de verificación.');
-      } else {
-        setError(errorMessage);
-      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
