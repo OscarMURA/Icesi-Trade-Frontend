@@ -1,0 +1,9 @@
+{
+    "rewrites": [
+      {
+        "source": "/verify-email",
+        "destination": "/index.html"
+      }
+    ]
+  }
+  
